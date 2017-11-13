@@ -1,3 +1,5 @@
+ 数值类型
+
 分为数值类型，非数值类型。
 
 数值类型包括，整形int，短整形short int，长整形long int，单精度浮点型float，双精度浮点型double。
@@ -192,3 +194,136 @@ int main()
 
 -----------------------------------------
 
+scanf接收输入
+
+![](http://images2017.cnblogs.com/blog/422101/201711/422101-20171113232930968-1229447417.png)
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+// 接收用户输入的小写字母，输出大写字母
+int main()
+{
+    char ch;
+
+    // 接收输入的内容
+    printf("请输入小写字母:\n");
+    scanf("%c",&ch); // scan扫描，f某种格式
+
+
+    while (ch < 97 || ch > 122 ) {
+        fflush(stdin); // 清空缓存
+        printf("输入有误，请重新输入:\n");
+        scanf("%c",&ch);
+    }
+
+    printf("小写字母%c对应的大写字母位%c",ch,ch-32);
+
+
+
+    return 0;
+}
+
+```
+
+小练习，计算英雄伤害：
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+// 游戏中根据英雄的生命值，计算英雄的真是伤害
+int main()
+{
+    // 思考1、 需要定义几个变量？ -- 武器的最终真实伤害，最大生命值，武器的伤害
+    //     2、 对应什么数据类型？ -- double                int         double
+
+    double factPower;
+    int    strength;
+    double power = 256;
+
+    printf("请输入玩家的力量:\n");
+    scanf("%d",&strength);
+
+    factPower = power * (strength + 100) / 100;
+
+    printf("英雄的真实伤害为:%.2lf\n",factPower);
+
+    return 0;
+}
+
+```
+
+算术运算符与表达式
+
+一元运算符：++、--
+
+二元运算符：+、-、*、/、%
+
+
+
+取模
+
+%
+
+5%2 取余数 得 1
+
+5%3 取余数 得 2
+
+5%-3 得?
+
+-5%3 得?
+
+-5%-3得?
+
+
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    printf("%d\n",5%-3);
+
+    printf("%d\n",-5%-3);
+
+    printf("%d\n",-5%3);
+    return 0;
+}
+
+// 结果
+2
+-2
+-2
+```
+
+
+
+取模符号跟第一个数字的符号相关。
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    int num = 5 / 2;
+
+    printf("%d\n",num); // 2
+
+    double d = 5 / 2; // 整型 除以 整型 还是 整型
+
+    printf("%f\n",d); // 2.000000
+
+    double dd = 5.0 / 2; // 整型 除以 整型 还是 整型
+
+    printf("%f\n",dd); // 2.500000
+
+    return 0;
+}
+
+```
+
+细细分析也对，否则会把你掰弯。
