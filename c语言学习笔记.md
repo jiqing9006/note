@@ -629,7 +629,7 @@ int main() // 返回int，如果是void表示没有返回
 
 补码的出现解决了0的符号以及两个编码的问题。
 
-
+-------------------------------------------------
 
 sizeof可以获取数据类型的内存中的大小（字节）
 
@@ -659,3 +659,37 @@ int main() // 返回int，如果是void表示没有返回
 
 ```
 
+运算符优先级
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+// standared 标准
+// input output 输入/输出
+// header 头 .h头文件
+
+int main() // 返回int，如果是void表示没有返回
+{
+    // 算术运算符 + - * / %
+    // 关系运算符 > < >= <= == !=
+    // 逻辑运算符 && || !
+    // 位运算符 & | ^ ~
+
+    int num = 10;
+    int result = num++ == 10 && --num == 10;
+
+    /** 等同于
+    int result1 = (num++ == 10);
+    int result2 = (--num == 10);
+    int result = result1 && result2;
+    **/
+
+    printf("%d\n",result); // 1
+
+    return 0;
+}
+
+```
+
+> 老九语录，这道题的思路是这样的，你看对不对？自己在讲解的时候，就渐渐的清晰了。学会问问题，学会讲解问题。
