@@ -41,11 +41,11 @@ storage:
 ```
 
 ```
-sc.exe create MongoDB binPath="E:\MongoDB\Server\bin\mongod.exe --service --config=\"E:\MongoDB\mongod.cfg\"" DisplayName="MongoDB" start="auto"
+sc.exe create MongoDB binPath= "E:\MongoDB\Server\bin\mongod.exe --service --config=\"E:\MongoDB\mongod.cfg\"" DisplayName= "MongoDB" start= "auto"  
 ```
 
 ```
-net start MongoDB 
+net start MongoDB  
 ```
 
 ```
