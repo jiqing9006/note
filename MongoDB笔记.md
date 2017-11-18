@@ -667,7 +667,480 @@ db.students.find().skip(5).limit(5);
 
 
 
---------------------------------------------------
+---------------------------------------------
 
-### 数据更新操作
+**数据更新操作**
 
+队友MongoDB而言，数据更新是一件非常麻烦的事情。Mongo通常会存副本数据，数据有变更的时候，最好的做法是删除MongoDB的数据，重新插入。
+
+Mongo中提供了两个函数，一个是save(),一个是update()。
+
+
+
+范例：**更新存在的数据 --** 将年龄是19岁的人的成绩都更新为100分
+
+只更新查询出的第一条数据，没有不增加
+
+```
+db.students.update({"age":19},{"$set":{"score":100}},false,false);
+```
+
+所有满足条件的数据都更新
+
+```
+db.students.update({"age":19},{"$set":{"score":100}},false,true);
+```
+
+
+
+范例： **更新不存在的数据 --** 将年龄是30岁的人更新他的名称name
+
+```sql
+db.students.update({"age":30},{"$set":{"name":"小李子"}},true,false);
+```
+
+第一个true表示如果不存在，则创建一条新数据。这种功能用的比较少。
+
+
+
+
+
+**修改器**
+
+1. inc  主要针对一个数字字段，增加某个字段的数据内容。
+
+
+
+范例：将所有年龄为19岁的学生成绩一律减少30分。
+
+```
+db.students.update({"age":19},{"$inc":{"score":-30,"age":1}},false,true);
+```
+
+
+
+2. set 进行内容重新设置
+
+   ​
+
+   范例：将年龄为20的人的成绩修改为89
+
+   ```sql
+   db.students.update({"age":19},{"$set":{"score":-89}},false,true);
+   ```
+
+3. unset 删除某个成员的内容
+
+范例：删除张三的年龄和成绩信息
+
+```
+db.students.update({"name":"张三"},{"$unset":{"age":1,"score":1}},false,true);
+```
+
+
+
+4. push 相当于将内容追加到指定的成员之中（基本上是用于数组）。一次增加一个元素，如果增加的是数组，表示一次增加一个数组。
+
+范例：向张三添加课程信息
+
+```
+db.students.update({"name":"张三"},{"$push":{"course":["语文","数学"]}},false,true);
+```
+
+如果没有数组，就进行一个新的数组的创建，如果有则进行内容的追加。
+
+5. pushAll与push类似，可以一次追加多个内容到数组里面
+
+```
+db.students.update({"name":"张三"},{"$pushAll":{"course":["美术","音乐"]}},false,true);
+
+```
+
+6. addToSet 如果已存在就不添加了
+
+```
+db.students.update({"name":"张三"},{"$addToSet":{"course":"美术"}},false,true);
+```
+
+7. pop 删除数组内的数据。文档是行，成员是列，集合是表。-1表示第一个课程。1表示最后一个课程。
+
+```
+db.students.update({"name":"张三"},{"$pop":{"course":-1}});
+```
+
+8. pull  从数组中删除指定内容的数据
+
+```
+db.students.update({"name":"张三"},{"$pull":{"course":"美术"}});
+```
+
+
+
+9. pullAll一次性删除多个内容
+
+```
+db.students.update({"name":"张三"},{"$pullAll":{"course":["音乐","舞蹈"]}});
+```
+
+
+
+10. rename 为成员名称重命名
+
+```
+db.students.update({"name":"张三"},{"$rename":{"course":"课程"}},false,true);
+```
+
+----------------------------
+
+**删除数据**(比较常用)
+
+范例:清空infos集合中的内容。表、文档、成员。
+
+```
+db.infos.remove({"url":/-/});
+```
+
+默认情况下都删除，第二个条件设为true，只删除一个。
+
+```
+db.infos.remove({"url":/^www/},true);
+```
+
+删除全部
+
+```
+db.infos.remove({});
+```
+
+
+
+**游标(重点)**
+
+表示数据可以一行一行的进行操作！！！
+
+find()返回的就是游标
+
+通过hasNext()函数
+
+next()取出数据
+
+
+
+```js
+var cursor = db.students.find();
+
+while (cursor.hasNext()) {
+    var doc = cursor.next();
+    print("+++"+JSON.stringify(doc));
+}
+
+```
+
+```js
+var cursor = db.students.find();
+
+while (cursor.hasNext()) {
+    var doc = cursor.next();
+    printjson(doc);
+}
+```
+
+在这个循环中可以进一步的处理一些操作，必须修改年龄，修改成绩等等。
+
+
+
+---------------------------
+
+### **索引**
+
+提升数据库检索性能的手段
+
+**通过getIndexes()来获取已经存在的索引内容**
+
+```js
+db.students.getIndexes();
+```
+
+```json
+/* 1 */
+[
+    {
+        "v" : 1,
+        "key" : {
+            "_id" : 1
+        },
+        "name" : "_id_",
+        "ns" : "mldn.students"
+    }
+]
+```
+
+
+
+**创建自己的索引**
+
+范例：创建一个索引，在age列加一个将序索引
+
+```js
+db.students.ensureIndex({"age":-1});
+```
+
+```json
+/* 1 */
+[
+    {
+        "v" : 1,
+        "key" : {
+            "_id" : 1
+        },
+        "name" : "_id_",
+        "ns" : "mldn.students"
+    },
+    {
+        "v" : 1,
+        "key" : {
+            "age" : -1.0
+        },
+        "name" : "age_-1",
+        "ns" : "mldn.students"
+    }
+]
+```
+
+
+
+**使用解释来分析索引**
+
+```
+db.students.find({"age":19}).explain();
+```
+
+```json
+/* 1 */
+{
+    "queryPlanner" : {
+        "plannerVersion" : 1,
+        "namespace" : "mldn.students",
+        "indexFilterSet" : false,
+        "parsedQuery" : {
+            "age" : {
+                "$eq" : 19.0
+            }
+        },
+        "winningPlan" : {
+            "stage" : "FETCH",
+            "inputStage" : {
+                "stage" : "IXSCAN",
+                "keyPattern" : {
+                    "age" : -1.0
+                },
+                "indexName" : "age_-1",
+                "isMultiKey" : false,
+                "isUnique" : false,
+                "isSparse" : false,
+                "isPartial" : false,
+                "indexVersion" : 1,
+                "direction" : "forward",
+                "indexBounds" : {
+                    "age" : [ 
+                        "[19.0, 19.0]"
+                    ]
+                }
+            }
+        },
+        "rejectedPlans" : []
+    },
+    "serverInfo" : {
+        "host" : "jiqing",
+        "port" : 27017,
+        "version" : "3.2.17-25-gae6f04a",
+        "gitVersion" : "ae6f04a7cd143132fb3185669a8abc5d7c4ab3cc"
+    },
+    "ok" : 1.0
+}
+```
+
+
+
+再分析一个没有索引的成员
+
+```js
+db.students.find({"score":{"$gt":80}}).explain();
+```
+
+
+
+```json
+/* 1 */
+{
+    "queryPlanner" : {
+        "plannerVersion" : 1,
+        "namespace" : "mldn.students",
+        "indexFilterSet" : false,
+        "parsedQuery" : {
+            "score" : {
+                "$gt" : 80.0
+            }
+        },
+        "winningPlan" : {
+            "stage" : "COLLSCAN",
+            "filter" : {
+                "score" : {
+                    "$gt" : 80.0
+                }
+            },
+            "direction" : "forward"
+        },
+        "rejectedPlans" : []
+    },
+    "serverInfo" : {
+        "host" : "jiqing",
+        "port" : 27017,
+        "version" : "3.2.17-25-gae6f04a",
+        "gitVersion" : "ae6f04a7cd143132fb3185669a8abc5d7c4ab3cc"
+    },
+    "ok" : 1.0
+}
+```
+
+
+
+有索引和没索引的成员一起使用呢？
+
+```js
+db.students.find({"$and":[
+        {"age":{"$gt":19}},
+        {"score":{"$gt":80}}
+    ]}).explain();
+```
+
+and的时候用到了索引，or的时候没有用到。
+
+
+
+**可以定义复合索引**
+
+```js
+db.students.ensureIndex({"age":-1,"score":-1},{"name":"age_score_index"});
+```
+
+```json
+/* 1 */
+[
+    {
+        "v" : 1,
+        "key" : {
+            "_id" : 1
+        },
+        "name" : "_id_",
+        "ns" : "mldn.students"
+    },
+    {
+        "v" : 1,
+        "key" : {
+            "age" : -1.0
+        },
+        "name" : "age_-1",
+        "ns" : "mldn.students"
+    },
+    {
+        "v" : 1,
+        "key" : {
+            "age" : -1.0,
+            "score" : -1.0
+        },
+        "name" : "age_score_index",
+        "ns" : "mldn.students"
+    }
+]
+```
+
+
+
+**强制使用索引**
+
+```js
+db.students.find({"$or":[
+        {"age":{"$gt":19}},
+        {"score":{"$gt":80}}
+    ]}).hint({"age":-1,"score":-1}).explain();
+```
+
+
+
+**删除索引**
+
+```
+db.students.dropIndex({"age":-1,"score":-1});
+```
+
+删除全部索引，但是不会删除主键索引
+
+```
+db.students.dropIndexes();
+```
+
+
+
+###  **唯一索引**
+
+主要的目的是使得某个字段上的内容不重复。
+
+范例：创建一个唯一索引
+
+```
+db.students.ensureIndex({"name":1},{"unique":true});
+```
+
+```json
+/* 1 */
+[
+    {
+        "v" : 1,
+        "key" : {
+            "_id" : 1
+        },
+        "name" : "_id_",
+        "ns" : "mldn.students"
+    },
+    {
+        "v" : 1,
+        "unique" : true,
+        "key" : {
+            "name" : 1.0
+        },
+        "name" : "name_1",
+        "ns" : "mldn.students"
+    }
+]
+```
+
+
+
+这个时候如果插入的姓名已存在，将会报错。
+
+```
+E11000 duplicate key error collection: mldn.students index: name_1 dup key: { : "张三" }
+```
+
+
+
+### 过期索引
+
+用于手机验证码之类的与时间期限的数据。
+
+```
+db.phones.ensureIndex({"time":1},{expireAfterSeconds:10});
+
+
+db.phones.insert({"tel":"110","code":"110","time":new Date()});
+db.phones.insert({"tel":"111","code":"111","time":new Date()});
+db.phones.insert({"tel":"112","code":"112","time":new Date()});
+db.phones.insert({"tel":"113","code":"113","time":new Date()});
+db.phones.insert({"tel":"114","code":"114","time":new Date()});
+db.phones.insert({"tel":"115","code":"115","time":new Date()});
+db.phones.insert({"tel":"116","code":"116","time":new Date()});
+db.phones.insert({"tel":"117","code":"117","time":new Date()});
+```
+
+设置过期时间10秒，但是会有延迟。时间到了后，会删除。
