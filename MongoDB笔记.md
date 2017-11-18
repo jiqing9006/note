@@ -278,6 +278,8 @@ MongoDB中出了增加之外，其他的操作都很麻烦。
 
   ![](http://images2017.cnblogs.com/blog/422101/201711/422101-20171117140337921-1601357481.png)
 
+  ​
+
 * 数据查询
 
   ​
@@ -622,3 +624,50 @@ db.students.find({"name":{"$regex":/a/i}});
 ```
 db.students.find({"course":{"$regex":/语文/}});
 ```
+
+**数据排序**
+
+通过sort()函数，升序是1，将序-1。1和-1不要加引号。
+
+
+
+范例：按照成绩排序，成绩高的排在前面
+
+```
+db.students.find({"course":{"$regex":/语文/}}).sort({"score":-1});
+```
+
+
+
+范例：自然排序，按照数据保存的先后顺序排序
+
+```
+db.students.find({"course":{"$regex":/语文/}}).sort({"$natural":-1});
+```
+
+
+
+**分页显示**
+
+两个操作函数 :alarm_clock:
+
+skip(n):表示跨过多少数据行
+
+limit(n):表示取出多少行
+
+
+
+范例：分页获取数据（第一页，skip(0),limit(5)。第二页，skip(5),limit(5)）
+
+
+
+```sql
+db.students.find().skip(5).limit(5);
+```
+
+
+
+--------------------------------------------------
+
+### 数据更新操作
+
