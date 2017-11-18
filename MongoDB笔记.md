@@ -41,11 +41,11 @@ storage:
 ```
 
 ```
-sc.exe create MongoDB binPath= "E:\MongoDB\Server\bin\mongod.exe --service --config=\"E:\MongoDB\mongod.cfg\"" DisplayName= "MongoDB" start= "auto"  
+sc.exe create MongoDB binPath= "E:\MongoDB\Server\bin\mongod.exe --service --config=\"E:\MongoDB\mongod.cfg\"" DisplayName= "MongoDB" start= "auto" 
 ```
 
 ```
-net start MongoDB  
+net start MongoDB 
 ```
 
 ```
@@ -447,7 +447,7 @@ db.students.find({"course":{"$all":["语文","数学"]}});
 db.students.find({"address":{"$all":["海淀区"]}});
 ```
 
-例子：查询课程数组中第二个内容是音乐的用户。使用索引。
+**范例**：查询课程数组中第二个内容是音乐的用户。使用索引。
 
 ```
 db.getCollection('students').find({"course.1":"音乐"})
@@ -455,7 +455,7 @@ db.getCollection('students').find({"course.1":"音乐"})
 
 ![](http://images2017.cnblogs.com/blog/422101/201711/422101-20171117164907359-398577687.png)
 
-范例：查询只参加两门课程的学生
+**范例**：查询只参加两门课程的学生
 
 ```
 db.getCollection('students').find({"course":{"$size":2}})
@@ -469,7 +469,7 @@ db.getCollection('students').find({"course":{"$size":2}})
 
 
 
-范例：返回年龄为19岁的学生信息，课程信息只返回两条。
+**范例**：返回年龄为19岁的学生信息，课程信息只返回两条。
 
 ```
 db.getCollection('students').find({"age":21},{"course":{"$slice":2}})
@@ -482,4 +482,65 @@ db.getCollection('students').find({"age":21},{"course":{"$slice":-2}})
 ```
 
 或者只取出中间部分的信息。
+
+```
+db.getCollection('students').find({"age":21},{"course":{"$slice":[1,2]}})
+```
+
+**嵌套集合运算**
+
+再增加一些数据
+
+```js
+db.students.insert({"name":"高大拿 - A","sex":"女","age":21,"score":0,"address":"海淀区","course":["语文","数学","英语","音乐","政治"],
+    "parents":
+        [{"name":"高大拿 - A(父亲)","age":50,"job":"工人"},
+        {"name":"高大拿 - A(母亲)","age":46,"job":"职员"}]
+    });
+db.students.insert({"name":"高大拿 - B","sex":"男","age":19,"score":70,"address":"朝阳区","course":["语文","数学"],
+    "parents":
+        [{"name":"高大拿 - B(父亲)","age":50,"job":"处长"},
+        {"name":"高大拿 - B(母亲)","age":46,"job":"局长"}]
+    });
+db.students.insert({"name":"高大拿 - C","sex":"女","age":21,"score":56,"address":"西城区","course":["语文","数学","英语"],
+    "parents":
+        [{"name":"高大拿 - C(父亲)","age":50,"job":"工人"},
+        {"name":"高大拿 - C(母亲)","age":46,"job":"局长"}]
+    });
+
+
+```
+
+范例：查询年龄是19，父母中有职务是局长的数据
+
+````
+db.getCollection('students').find({
+    "$and":[
+        {"age":19},
+        {"parents":{"$elemMatch":{"job":"局长"}}}
+    ]
+    })
+
+
+````
+
+**判断某个字段是否存在**
+
+通过\$exists来判断某个字段是否存在
+
+
+
+范例：查询具有parents成员的数据
+
+```
+db.getCollection('students').find({
+            "parents":{"$exists":true}
+})
+
+
+```
+
+
+
+
 
