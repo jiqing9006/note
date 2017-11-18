@@ -542,5 +542,83 @@ db.getCollection('students').find({
 
 
 
+范例：查询不具有course成员的数据
+
+```
+db.students.find({
+            "course":{"$exists":false}
+})
+```
 
 
+
+**条件过滤**
+
+\$where
+
+```
+db.students.find({
+   "$where":"this.age>20"
+})
+```
+
+```
+db.students.find("this.age>21");
+```
+
+```
+db.students.find(function() {
+    return this.age > 20
+});
+```
+
+```
+db.students.find({"$where":function() {
+    return this.age > 20
+}});
+```
+
+多条件查询
+
+```
+db.students.find({"$and":[
+        {"$where":"this.age>20"},
+        {"$where":"this.score>20"}
+    ]});
+```
+
+这里会将MongoDB的BSON格式变为JavaScript格式，不方便使用数据库索引机制。
+
+
+
+**正则运算**
+
+范例：查询以“张”开头的姓名
+
+```
+db.students.find({"name":/^张/});
+```
+
+正则不要加引号了。
+
+
+
+范例：查询姓名有“A”的数据，加上i表示不区分大小写
+
+```
+db.students.find({"name":/a/i});
+```
+
+```
+db.students.find({"name":{"$regex":/a/i}});
+```
+
+
+
+除了可以单个查询之外，还可以进行数组查询。
+
+范例：查询数组数据中包含语文的数据
+
+```
+db.students.find({"course":{"$regex":/语文/}});
+```
