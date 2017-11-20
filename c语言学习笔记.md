@@ -928,3 +928,108 @@ int main() {
 
 ---------------------------------------------------------------------------------
 
+do while
+
+
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int a = 1,b = 10;
+    do {
+        b -= a;
+        a++;
+    } while (b-- < 0);
+
+    printf("%d\n",b); // 8
+
+    return 0;
+}
+
+
+```
+
+
+
+不管条件是否满足都执行一次。
+
+模拟dos游戏。
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int choice; // 用户的选择
+
+    // 打印游戏菜单
+    printf("性格测试:\n");
+    printf("如果您是一位君王，对于身旁的伴侣，你希望十什么样的？\n");
+    printf("1.只要有一位真爱的妻子\n");
+    printf("2.可以有两位以上的爱人\n");
+    printf("3.拥有三千佳丽\n");
+
+    do { // 如果输入错误，将会一直输入
+        printf("请选择:");
+        scanf("%d",&choice);
+
+        if (choice < 1 || choice >3) {
+            printf("只能输入1-3之间的数字！请重新输入！\n");
+        }
+    } while(choice <1 || choice > 3);
+
+    switch (choice) {
+        case 1 :
+            printf("你是好人");
+            break;
+        case 2:
+            printf("贪得无厌");
+            break;
+        case 3:
+            printf("大胆放肆");
+            break;
+    }
+
+    return 0;
+}
+
+```
+
+循环实现数字反转
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+
+    // 使用循环实现数字反转
+    int value,right_num;
+    value = 0;
+    do {
+        printf("\n请输入一个数:");
+        scanf("%d",&value);
+
+        if (value <= 0) {
+            printf("必须是正数!\n");
+        }
+
+    } while (value <= 0);
+
+
+    printf ("\n反转后的数为:");
+
+    do {
+        right_num = value % 10;
+        printf("%d",right_num);
+        value = value / 10;
+    } while (value != 0);
+    printf("\n");
+    return 0;
+}
+
+
+```
+
