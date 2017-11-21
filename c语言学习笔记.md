@@ -1033,3 +1033,229 @@ int main() {
 
 ```
 
+打印加法表
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int num;
+    // 打印简单加法表
+    printf("请输入一个数字：");
+
+    scanf("%d",&num);
+
+    int i ;
+    for (i = 0 ;i <num; i++) {
+        printf("%d + %d = %d",i,num-i,num);
+
+
+        if (i % 2 == 1) {
+            printf("\n");
+        } else {
+            printf("\t");
+        }
+    }
+
+
+    return 0;
+}
+
+
+```
+
+![](http://images2017.cnblogs.com/blog/422101/201711/422101-20171121230209477-1581996604.png)
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int age;
+
+    // for (;;)
+
+    while (1) {
+        printf("请输入玩家年龄:\n");
+        scanf("%d",&age);
+        // 判断年龄是否大于0
+        if (age<0) {
+            break;
+        }
+    }
+    printf("游戏结束！");
+
+    return 0;
+}
+
+
+```
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    // 设定一个商品价格
+    // 用户输入猜测的价格后，系统给出大小提示
+    // 如果在5轮内就猜到，就给于奖励提示
+    int price = 1000;
+    int count = 0;
+
+    int guessPrice;
+
+    while (1) {
+        printf("请输入商品价格:\n");
+        scanf("%d",&guessPrice);
+
+        count++;
+
+        if (guessPrice > price) {
+            printf("大了\n");
+        }
+
+        if (guessPrice < price) {
+            printf("小了\n");
+        }
+
+        if (guessPrice == price) {
+            if (count <=5 ) {
+                printf("5轮之内就猜对了，你真棒！");
+            } else {
+                printf("猜对了!");
+            }
+
+            break;
+        }
+    }
+
+    return 0;
+}
+
+
+```
+
+![](http://images2017.cnblogs.com/blog/422101/201711/422101-20171121235256727-875879476.png)
+
+
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    // 循环输入5个玩家的年龄，统计年龄为负数的次数
+    int i;
+    int age;
+    int wrongCount = 0;
+
+    for (i = 0 ; i< 5 ;i ++) {
+        printf("请输入玩家年龄：\n");
+        scanf("%d",&age);
+        if (age > 0)
+            continue;
+
+        wrongCount++;
+    }
+
+    printf("错误的次数为%d",wrongCount);
+
+
+
+    return 0;
+}
+
+
+```
+
+
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    // c语言算法题很有意思
+    // 求1-100之间的偶数和
+    int i = 1;
+
+    int sum = 0;
+
+    for (i ; i<= 100 ; i++) {
+        if (i % 2 == 0) {
+            sum += i;
+        }
+    }
+
+    printf("1到100之间的偶数和为%d",sum);
+
+
+    return 0;
+}
+
+
+```
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    // 用 "*" 输出一个菱形图案
+
+    /*
+
+         *
+        ***
+       *****
+      *******
+       *****
+        ***
+         *
+
+      ###*
+      ##***
+      #*****
+      *******
+      #*****
+      ##***
+      ###*
+
+    */
+
+
+    // 设置双循环
+    // 外层循环控制行，内层循环控制列
+    int i,j;
+    for (i = 0;i < 7;i ++) {
+
+        int starNum;
+        int spaceNum;
+        if (i < 4) {
+            starNum = i * 2 + 1;
+            spaceNum = 3 - i;
+        } else {
+            starNum = (6 - i) * 2 + 1;
+            spaceNum = (3 - (6 - i));
+        }
+
+
+        for (j = 0;j < spaceNum; j++) {
+            printf(" ");
+        }
+
+        for (j = 0;j < starNum; j++) {
+            printf("*");
+        }
+        printf("\n");
+    }
+
+
+    return 0;
+}
+
+
+```
+
+太难了
