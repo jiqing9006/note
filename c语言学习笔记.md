@@ -1259,3 +1259,112 @@ int main() {
 ```
 
 太难了
+
+-----
+
+![](https://images2018.cnblogs.com/blog/422101/201711/422101-20171123231456140-1131558490.png)
+
+![](https://images2018.cnblogs.com/blog/422101/201711/422101-20171123231851453-1765951930.png)
+
+
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+#define N 5
+int main() {
+    double score[5];
+    int i;
+    for (i = 0; i< N ;i++)
+    {
+        printf("请输入第%d门课的成绩:",i+1);
+        scanf("%lf",&score[i]);
+    }
+
+    printf("---------------------\n");
+
+    int j;
+    for (j = 0; j< N ;j++)
+    {
+        printf("第%d门课的成绩为%.2lf\n",j+1,score[j]);
+    }
+
+    return 0;
+}
+
+
+```
+
+综合的小练习
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+//宏定义布尔类型
+#define BOOL int
+#define TRUE 1
+#define FALSE 0
+
+int main() {
+    int arr[] = {8,4,2,1,23,344,12};
+
+    // 循环输出数组的值
+    int length;
+
+    length = sizeof(arr)/sizeof(arr[0]);
+
+    int i;
+    for (i=0;i<length;i++) {
+        printf("数组第%d个元素值为%d\n",i+1,arr[i]);
+    }
+
+    // 求数组中所有元素的和与平均值
+    double sum = 0;
+    double average;
+    for (i=0;i<length;i++) {
+        sum += arr[i];
+    }
+
+    average = sum / length;
+
+    printf("数组元素的和为：%.2lf\n",sum);
+    printf("数组元素的平均值为：%.2lf\n",average);
+
+    // 输入数值判断是否存在数组中，循环五次
+    int guessNum;
+    int count = 0;
+    BOOL isInArray;
+    while (count < 5) {
+        printf("请输入数值：");
+        scanf("%d",&guessNum);
+
+        isInArray = FALSE;
+        for (i=0;i<length;i++) {
+            if (guessNum == arr[i]) {
+                isInArray = TRUE;
+                break;
+            }
+        }
+
+        if (isInArray) {
+            printf("输入的数值在数组中\n");
+        } else {
+            printf("输入的数值不在数组中\n");
+        }
+
+        count++;
+    }
+
+
+
+
+
+    return 0;
+}
+
+
+
+```
+
