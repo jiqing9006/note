@@ -1368,3 +1368,145 @@ int main() {
 
 ```
 
+冒泡排序
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+//宏定义布尔类型
+#define SIZE 5
+
+int main() {
+    // 循环录入5个整型数字，进行降序排列后输出
+
+    // 冒泡排序
+
+    int arr[SIZE] = {};
+    int i;
+    printf("请输入5个数字:\n");
+    for (i = 0;i<SIZE;i++) {
+        scanf("%d",&arr[i]);
+    }
+
+    for (i=0;i<SIZE;i++) {
+        printf("输入第%d个数字为:%d\n",i,arr[i]);
+    }
+
+    // 进行冒泡排序，降序排列，大的排在前面，小的排在后面
+    bubble_sort(arr,SIZE);
+    printf("降序排序后的顺序为:\n");
+
+    for (i=0;i<SIZE;i++) {
+        printf("输入第%d个数字为:%d\n",i,arr[i]);
+    }
+
+
+
+    return 0;
+}
+
+// 冒泡函数
+void bubble_sort(int a[],int n) {
+    int i,j,temp;
+    for (i=0;i<n-1;i++) { // 只需要n-1轮
+
+        // 每一轮的比较
+        for (j=0;j<n-1-i;j++) { // 每一轮比较的次数都会越来越少
+            // 核心的判断
+            if (a[j] < a[j+1]) {
+                // 交换位置，大的排在前面
+                temp = a[j];
+                a[j] = a[j+1];
+                a[j+1] = temp;
+            }
+        }
+    }
+}
+
+
+```
+
+删除真心费劲，感觉还是php操作数组更加便捷。
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    // 数组删除元素
+    int count = 5;
+    double powers[] = {42322,25771,40907,41234,40767};
+    double deletePower; // 用户要删除的战力值
+    int deleteIndex = -1; // 要删除的战力值的下标
+    int i;
+
+    printf("请输入要删除的战力值:\n");
+    scanf("%lf",&deletePower);
+
+    for (i= 0;i<count;i++) {
+        if (deletePower == powers[i]) {
+            // 记录下标
+            deleteIndex = i;
+            break;
+        }
+    }
+
+    // 判断是否找到
+    if (deleteIndex >=0) {
+        // 从下标开始，后面一个覆盖前面一个数字
+        for (i = deleteIndex ; i <count -1;i++) {
+            powers[i] = powers[i+1];
+        }
+    } else {
+        printf("很遗憾，没有找到要删除的战力值");
+    }
+
+    for (i=0;i<count-1;i++) {
+        printf("第%d个元素为:%.2lf\n",i,powers[i]);
+    }
+
+
+
+    return 0;
+}
+
+```
+
+
+
+二维数组
+
+![](https://images2018.cnblogs.com/blog/422101/201711/422101-20171127200353565-583612307.png)
+
+![](https://images2018.cnblogs.com/blog/422101/201711/422101-20171127200955784-972888749.png)
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    // 使用二维数组表示学生的成绩，并展示
+    double scores[4][3] = {
+        {98,67,93},
+        {88,87,93},
+        {98,65,93},
+        {68,67,93}
+    };
+
+    int i,j;
+    // 使用双循环输出
+    for (i = 0;i<4;i++) {
+        for (j=0;j<3;j++) {
+            printf("%.2lf\t",scores[i][j]);
+        }
+
+        printf("\n");
+    }
+
+    return 0;
+}
+
+
+```
+
