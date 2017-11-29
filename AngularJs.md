@@ -1,5 +1,9 @@
 一个操作JSON更方便的库！
 
+
+
+###jquery对数据处理不太友好
+
 ```html
 <!doctype html>
 <html lang="en">
@@ -33,7 +37,7 @@ jquery更倾向于效果的实现！而处理数据的话，还是angular更好�
 
 
 
-再看看AngularJs的例子，
+### AngularJS 更好的处理数据。MVVM模式
 
 ```html
 <!doctype html>
@@ -87,7 +91,7 @@ jquery更倾向于效果的实现！而处理数据的话，还是angular更好�
 
 王者荣耀！
 
-
+### 感受angular的魅力
 
 ```html
 <!doctype html>
@@ -151,6 +155,8 @@ jquery更倾向于效果的实现！而处理数据的话，还是angular更好�
 
 
 
+### 表单操作
+
 ```html
 <!doctype html>
 <html lang="en">
@@ -199,7 +205,7 @@ jquery更倾向于效果的实现！而处理数据的话，还是angular更好�
 
 感受一下表单提交！
 
-
+### ng-value
 
 ```html
 <!doctype html>
@@ -242,7 +248,7 @@ jquery更倾向于效果的实现！而处理数据的话，还是angular更好�
 
 
 
-
+### radio操作
 
 ```html
 <!doctype html>
@@ -294,6 +300,8 @@ ng-show
 
 
 
+### checkBox 操作
+
 ```html
 <!doctype html>
 <html lang="en">
@@ -332,6 +340,10 @@ ng-show
 ```
 
 感受一下checkbox中angular的使用！
+
+
+
+### select操作
 
 ```html
 <!doctype html>
@@ -378,7 +390,7 @@ ng-show
 
 感受一下select的使用！
 
-
+### 遍历操作
 
 ```
 <!doctype html>
@@ -422,4 +434,4 @@ ng-show
 </html>
 ```
 
-遍历操作，感受一下
+遍历操作，感受一下！
