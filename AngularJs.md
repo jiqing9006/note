@@ -435,3 +435,230 @@ ng-show
 ```
 
 遍历操作，感受一下！
+
+
+
+### 结合jQuery一起使用
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="../org/angular-1.6.6.min.js"></script>
+    <script src="../org/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="../org/css/bootstrap-3.3.7.min.css">
+</head>
+
+<style></style>
+
+<body ng-app="hd">
+
+<div ng-controller="ctrl" >
+    <form action="3.php" method="post" role="form">
+        <legend>表单</legend>
+
+        <div class="form-group">
+            <label for="title">标题:</label>
+            <input type="text" class="form-control"  ng-model="field.title" id="title">
+        </div>
+
+        <div class="form-group">
+            <label for="click">点击数:</label>
+            <input type="text" class="form-control"  ng-model="field.click" id="click">
+        </div>
+
+        <div class="form-group">
+            <label for="content">内容:</label>
+            <input type="text" class="form-control"  ng-model="field.content" id="content">
+        </div>
+
+        <div class="form-group" hidden>
+            <textarea name="data" id="" cols="30" rows="10"></textarea>
+        </div>
+
+
+        <button type="submit" class="btn btn-primary">提交</button>
+    </form>
+    
+    
+    {{data.name}}
+</div>
+
+<script>
+    var m = angular.module('hd',[]);
+    m.controller('ctrl',['$scope',function ($scope) {
+        $scope.field = {title:'后盾人',click:100,content:'后盾网 人人做后盾'};
+
+        // 结合jq一起使用，dom操作与数据操作相结合
+        $('form').submit(function () {
+            $("[name='data']").val(angular.toJson($scope.field));
+//            return false;
+        });
+    }]);
+
+</script>
+</body>
+</html>
+```
+
+### 常用的函数
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="../org/angular-1.6.6.min.js"></script>
+    <link rel="stylesheet" href="../org/css/bootstrap-3.3.7.min.css">
+</head>
+
+<style></style>
+
+<body ng-app="hd">
+
+<div ng-controller="ctrl" >
+</div>
+
+<script>
+    var m = angular.module('hd',[]);
+    m.controller('ctrl',['$scope',function ($scope) {
+        // 检查php分配过来的数据或者动态运算的数据是否是数组
+        console.log(angular.isArray([])); // true
+
+        console.log(angular.isArray({})); // false
+
+        // 是否是日期
+        console.log(angular.isDate(new Date())); // false
+
+        var a;
+        // 是否定义，没有定义数据就是假
+        console.log(angular.isDefined(a)); // false
+
+        var b = 'hello';
+        console.log(angular.isDefined(b)); // true
+
+        // 是否是数字
+        console.log(angular.isNumber(88)); // true
+
+        // 是否是字符串
+        console.log(angular.isString(88)); // false
+
+        // 是否是对象
+        var c = {};
+        console.log(angular.isObject(c)); // true
+
+        // 是否是节点元素
+        var e = document.getElementsByTagName('body').item(0);
+
+        console.log(angular.isElement(e));
+
+        // 比较两个数据是否相同
+        var f = {};
+        var g = [];
+        console.log(angular.equals(f,g));
+    }]);
+
+</script>
+</body>
+</html>
+```
+
+### ng-trim
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../org/css/bootstrap-3.3.7.min.css">
+</head>
+
+<style></style>
+
+<body ng-app="hd">
+
+<div ng-controller="ctrl" >
+    <form action="2.php" method="post" role="form">
+        <legend>表单</legend>
+
+        <div class="form-group">
+            <label for="title">标题</label>
+
+            <!-- ng-trim 对数据进行了过滤处理 -->
+            <input type="text" class="form-control" ng-trim ng-model="title" id="title" >
+        </div>
+
+        <input type="text" name="data"><br/>
+
+        <button type="submit" class="btn btn-primary">提交</button>
+    </form>
+
+    {{title}}
+</div>
+
+<script src="../org/angular-1.6.6.min.js"></script>
+<script src="../org/jquery-3.2.1.min.js"></script>
+
+<script>
+    var m = angular.module('hd',[]);
+    m.controller('ctrl',['$scope',function ($scope) {
+        $scope.title = "";
+        $('form').submit(function () {
+            $("[name='data']").val($scope.title);
+//            return false;
+        });
+    }]);
+
+</script>
+</body>
+</html>
+```
+
+> 实践过程中出错是好事情，解决了错误，你会对知识点理解的更加透彻。
+>
+> angular和jquey就像是飞机和火车，可以让我们旅行过程中更好的到达目的地，原生就像是走路。走路一样可以到达目的地，只要你想走。
+>
+> 什么叫学会，就是不看老师的视频，不看老师的代码，自己敲出来。
+>
+> 你对照老师的代码敲出来，它并不属于你。
+
+
+
+### 注册协议小案例
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../org/css/bootstrap-3.3.7.min.css">
+</head>
+
+<style></style>
+
+<body ng-app="hd">
+
+<div ng-controller="ctrl" >
+    <label><input type="checkbox" ng-model="status"> 接收协议</label>
+    <button ng-init="copyright=false" ng-click="copyright=!copyright;">查看协议</button>
+    <br/>
+    <textarea ng-if="copyright">协议内容:啦啦啦</textarea>
+    <br/>
+    
+    <button ng-disabled="!status">登录</button>
+</div>
+
+
+<script src="../org/angular-1.6.6.min.js"></script>
+<script>
+    var m = angular.module('hd',[]);
+    m.controller('ctrl',['$scope',function ($scope) {
+
+    }]);
+
+</script>
+</body>
+</html>
+```
+
