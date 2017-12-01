@@ -1518,4 +1518,255 @@ int main() {
 
 一个综合的游戏，对所学知识进行整合！
 
-huang
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h> // 支持字符串操作
+#include <windows.h>
+#include <mmsystem.h>
+#pragma comment(lib,"winmm.lib")
+
+#define MAX 6 // 最大的妃子数量
+int main()
+{
+    // 项请目实践之陛下翻牌
+    // 播放音乐
+    PlaySound(TEXT("sounds\\背景音乐.wav"),NULL,SND_FILENAME | SND_ASYNC | SND_LOOP);
+
+
+    // 8个字符能存放4个汉字
+    char tempName[20];
+    // 定义二维数组来存放妃子
+    char names[MAX][20] = {"西施","貂蝉","王昭君","杨玉环","赵飞燕"};
+
+    // 定义二维数组来存放妃子等级
+    char levelNames[5][8] = {"贵人","嫔妃","贵妃","皇贵妃","皇后"};
+
+    // 存放每个妃子的等级
+    int levels[MAX] = {0,0,2,0,0,-1};
+
+    // 用来存放每个妃子的好感度
+    int loves[MAX] = {100,100,100,100,100,-1};
+
+    int i,j,temp; // 用于冒泡排序
+    int count = 5; // 当前未被打入冷宫的妃子数量
+    int day = 1; // 第几天
+
+    /*
+    printf("测试代码：查看当前嫔妃的状态\n");
+    printf("%-12s级别\t好感度\n","姓名");
+    for (i = 0;i <count;i++) {
+        printf("%-12s%s\t%d\n",names[i],levelNames[levels[i]],loves[i]);
+    }
+    */
+
+    // 皇帝的名号
+    char emperorName[50];
+    // 皇帝的选择
+    int choice;
+
+    int selectIndex; // 选择的妃子的index
+
+    // 使用字符数组表示字符串
+    printf("请输入当前登基的皇帝名号:");
+
+    scanf("%s",emperorName); // 录入字符串
+    printf("当前皇帝是【%s】,万岁万岁万万岁!\n",emperorName);
+
+
+    while (day <= 10) {
+        printf("******************************************************\n");
+        printf("第%d天\n",day);
+        day++;
+
+        // 做出菜单
+        printf("1.皇帝下旨选妃\t\t (增加)\n");
+
+        printf("2.翻牌宠幸 \t\t (修改状态)\n");
+
+        printf("3.打入冷宫 \t\t (删除)\n");
+
+        printf("4.召见爱妃去谈心 \n");
+
+        printf("陛下请选择： \n");
+
+
+        scanf("%d",&choice);
+
+        switch(choice) {
+            case 1: // 1.皇帝下旨选妃\t\t (增加)\n
+                PlaySound(TEXT("sounds\\选妃.wav"),NULL,SND_FILENAME | SND_ASYNC);
+
+                if (count < MAX) {
+                    // 执行添加操作
+                    printf("请输入娘娘的名讳:");
+                    scanf("%s",names[count]);
+                    // 初始化状态
+                    levels[count] = 0;
+                    loves[count]  = 100;
+
+                    count++;
+
+                } else {
+                    printf("陛下要注意龙体啊，后宫已经人满为患！\n");
+                }
+
+
+                break;
+
+            case 2: // 2.翻牌宠幸 \t\t (修改状态)\n
+                PlaySound(TEXT("sounds\\翻牌.wav"),NULL,SND_FILENAME | SND_ASYNC);
+                // 1. 找到妃子
+                // 2. 修改妃子状态 好感度+10 级别升1级 最高级不再升
+                // 3. 修改其他妃子的状态 其他妃子 好感度 -10
+                printf("陛下请输入今天要翻牌的妃子：");
+                scanf("%s",tempName);
+
+                selectIndex = -1;
+
+                // strcmp(tempName,"abc") 0表示两个字符串相等，1表示前一个大于后一个，-1表示前一个小于后一个
+                for (i = 0;i<count ;i++) {
+                    if (strcmp(tempName,names[i]) == 0) {
+                        selectIndex = i;
+                        break;
+                    }
+                }
+
+                if (selectIndex == -1) {
+                    printf("皇上，这个妃子不存在啊！\n");
+                    break;
+                }
+
+                // 更改选中人的状态
+                if (levels[selectIndex] < 4) {
+                    levels[selectIndex] += 1;
+                }
+                loves[selectIndex]  += 10;
+
+                // 更改其他妃子的状态
+                for (i = 0;i<count ;i++) {
+                    if (i != selectIndex) {
+                        loves[i]  -= 10;
+                    }
+                }
+
+
+                break;
+
+
+            case 3: // 3.打入冷宫 \t\t (删除)\n
+                PlaySound(TEXT("sounds\\冷宫.wav"),NULL,SND_FILENAME | SND_ASYNC);
+                // 1.查找
+                // 2.后面一个赋给前面一个
+                // 3.总数--
+                printf("请输入需要打入冷宫的妃子姓名：");
+                scanf("%s",tempName);
+
+                selectIndex = -1;
+
+                // strcmp(tempName,"abc") 0表示两个字符串相等，1表示前一个大于后一个，-1表示前一个小于后一个
+                for (i = 0;i<count ;i++) {
+                    if (strcmp(tempName,names[i]) == 0) {
+                        selectIndex = i;
+                        break;
+                    }
+                }
+
+                if (selectIndex == -1) {
+                    printf("皇上，这个妃子不存在啊！\n");
+                    break;
+                }
+
+                for (i = selectIndex ; i<count - 1;i++) {
+                    // names[i] = names[i + 1]; C语言中不支持数组的直接赋值，字符串在C语言中就是数组
+                    strcpy(names[i],names[i+1]);
+                    loves[i] = loves[i + 1];
+                    levels[i] = levels[i + 1];
+                }
+                count-- ;
+
+                break;
+
+
+            case 4: // 4.召见爱妃去谈心 \n
+                PlaySound(TEXT("sounds\\一笑倾城.wav"),NULL,SND_FILENAME | SND_ASYNC);
+
+                printf("请输入需要单独约见的妃子姓名：");
+                scanf("%s",tempName);
+
+                selectIndex = -1;
+
+                // strcmp(tempName,"abc") 0表示两个字符串相等，1表示前一个大于后一个，-1表示前一个小于后一个
+                for (i = 0;i<count ;i++) {
+                    if (strcmp(tempName,names[i]) == 0) {
+                        selectIndex = i;
+                        loves[i] += 10;
+                        break;
+                    }
+                }
+
+                if (selectIndex == -1) {
+                    printf("皇上，这个妃子不存在啊！\n");
+                    break;
+                }
+
+                break;
+
+            default:
+                printf("君无戏言，陛下请再次确认！\n");
+                break;
+
+        }
+
+        // 播放背景音乐
+        PlaySound(TEXT("sounds\\背景音乐.wav"),NULL,SND_FILENAME | SND_ASYNC | SND_LOOP);
+
+        // 按照级别进行排序，使用冒泡排序
+        for (i = 0;i<count-1;i++) {
+            for ( j = 0;j< count - i - 1;j++) {
+                if (levels[j] < levels[j+1]) { // 交换
+                    temp = levels[j];
+                    levels[j] = levels[j+1];
+                    levels[j+1] = temp;
+
+                    temp = loves[j];
+                    loves[j] = loves[j+1];
+                    loves[j+1] = temp;
+
+                    strcpy(tempName,names[j]);
+                    strcpy(names[j],names[j+1]);
+                    strcpy(names[j+1],tempName);
+                }
+            }
+        }
+
+        printf("当前后宫人员状态\n");
+        printf("%-12s级别\t好感度\n","姓名");
+        for (i = 0;i <count;i++) {
+            printf("%-12s%s\t%d\n",names[i],levelNames[levels[i]],loves[i]);
+        }
+
+        for (i = 0;i <count ;i++) {
+            if (loves[i] < 60) {
+                printf("皇上，有妃子被冷落了，生了杀意。游戏失败。\n");
+
+                // 跳转到over的位置
+                goto over;
+            }
+        }
+
+
+    }
+
+
+    printf("恭喜你，赢了!\n");
+
+    over:
+
+
+    return 0;
+}
+
+```
+
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171201223928714-292179589.png)
