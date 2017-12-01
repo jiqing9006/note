@@ -1822,3 +1822,25 @@ int main()
 
 **内存地址实际上是一种偏移量，存储于段寄存器中。内存地址只是一种抽象，不是真正的物理内存地址，而是逻辑地址。由逻辑地址寻找到物理地址需要经过 逻辑地址->线性地址->物理地址 转换过程，而这些过程都是基于寄存器完成的。**
 
+```
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    int num = 9;
+    int * ptr_num = &num;
+    * ptr_num = 10;
+    printf("* ptr_num的值为:%d\n",* ptr_num);
+    printf("num的值为:%d\n",num); // p表示指针占位符
+    return 0;
+}
+
+```
+
+
+
+**指针的类型，跟他所指向的数据结构有关。**
+**基本类型的指针指向基本类型的数据结构。**
+**比如：char * p; int *p; float *p; double *p;**
+**分别指向的是char， int ，float,  double 类型的变量。**
