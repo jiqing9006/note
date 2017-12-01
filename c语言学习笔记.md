@@ -1842,5 +1842,5 @@ int main()
 
 **指针的类型，跟他所指向的数据结构有关。**
 **基本类型的指针指向基本类型的数据结构。**
-**比如：char * p; int *p; float *p; double *p;**
+比如：char * p; int *p; float *p; double *p;
 **分别指向的是char， int ，float,  double 类型的变量。**
