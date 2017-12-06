@@ -126,15 +126,96 @@ Redis支持数据的备份
 
 
 
+```
+tar -zxvf redis-4.0.1.tar.gz
+```
 
 
 
 
 
+#### Linux下安装
+
+企业中，99%都是在Linux中运用和安装的。Windows中可以自己玩，Linux中才是实战。
+
+学会linux安装redis很有用。
+
+1.下载copy到opt目录中
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171207012507956-1126680614.png)
+
+2.解压
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171207012548691-2003056342.png)
+
+```
+tar -zxvf redis-4.0.1.tar.gz
+```
+
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171207012701191-1956478636.png)
 
 
 
+3.进入文件夹下，尝试make。有可能会因为不存在gcc而失败。
 
+GCC是linux下的编译程序，是C程序的编译工具。
+```
+yum install gcc gcc+c++
+```
+
+
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171207012740550-739074227.png)
+
+
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171207012752847-2121953402.png)
+
+
+4.make install
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171207012855534-995800626.png)
+
+
+5.make test测试发现需要安装tcl
+
+```
+wget http://downloads.sourceforge.net/tcl/tcl8.6.1-src.tar.gz
+
+sudo tar xzvf tcl8.6.1-src.tar.gz -C /usr/local/
+
+cd /usr/local/tcl8.6.1
+
+sudo ./configure
+
+sudo make
+
+sudo make install
+```
+
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171207013053956-296540241.png)
+
+
+
+6.查看安装后的bin目录
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171207013210894-390712671.png)
+
+
+7.新建myredis目录，存储配置文件
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171207013251050-1777147905.png)
+
+8.增加用户名密码配置
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171207013552925-878099774.png)
+
+
+9.检查服务是否开启
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171207013610925-695986788.png)
+
+10.启动服务
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171207013639363-2137147551.png)
+
+
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171207013648347-1740039817.png)
+
+11.关闭服务
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171207013930831-1022980102.png)
+
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171207010034644-303544749.png)
 
 
 
