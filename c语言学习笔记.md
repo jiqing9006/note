@@ -1844,3 +1844,42 @@ int main()
 **基本类型的指针指向基本类型的数据结构。**
 比如：char * p; int *p; float *p; double *p;
 **分别指向的是char， int ，float,  double 类型的变量。**
+
+
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    int num1 = 1024;
+    int num2 = 2048;
+    int * ptr1;
+    int * ptr2;
+    ptr1 = &num1;
+    ptr2 = &num2;
+    printf("num1的值是%d\tnum1的地址是：%p\n",num1,ptr1);
+    printf("num2的值是%d\tnum2的地址是：%p\n",num2,ptr2);
+
+    // 将变量1的值赋给变量2
+    num2 = num1;
+    printf("num1的值是%d\tnum1的地址是：%p\n",num1,ptr1);
+    printf("num2的值是%d\tnum2的地址是：%p\n",num2,ptr2);
+
+    *ptr2 = *ptr1; // 等价于 num2 = num1
+    printf("num1的值是%d\tnum1的地址是：%p\n",num1,ptr1);
+    printf("num2的值是%d\tnum2的地址是：%p\n",num2,ptr2);
+
+    // 地址变了，num1，num2不受影响
+    ptr2 = ptr1;
+    printf("num1的值是%d\tnum1的地址是：%p\n",num1,ptr1);
+    printf("num2的值是%d\tnum2的地址是：%p\n",num2,ptr2);
+
+
+    return 0;
+}
+
+```
+
+> 一个变量就是一个内存空间，内存一定是有物理地址的！指针就是保存变量内存物理地址的变量！
