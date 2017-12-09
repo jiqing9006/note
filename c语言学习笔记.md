@@ -1883,3 +1883,50 @@ int main()
 ```
 
 > 一个变量就是一个内存空间，内存一定是有物理地址的！指针就是保存变量内存物理地址的变量！
+
+### 指针与数组
+
+数组是一个连续的内存空间，数组名就是它的首地址。
+
+```C
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    double score[] = {98,87,65,43,76};
+    printf("数组的首地址:%p\t 数组手元素的地址 :%p\n",score,&score[0]);
+
+}
+
+```
+
+数组名就是数组元素的首地址。
+
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171210000617685-1549460925.png)
+
+```C
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    int i;
+    double score[5] = {98,87,65,43,76};
+    double * ptr_score;
+    ptr_score = score;
+    for (i=0;i<5;i++) {
+        printf("%.2lf\n",*ptr_score++); // 通过首地址取找数组元素的值
+    }
+
+    for (i=0;i<5;i++) {
+        printf("%.2lf\n",score[i]);
+    }
+
+}
+```
+
+
+
+等价的！double类型的数据，每个数据移动了8个字节。物理地址是一个十六进制的数字。
+
