@@ -1930,3 +1930,35 @@ int main()
 
 等价的！double类型的数据，每个数据移动了8个字节。物理地址是一个十六进制的数字。
 
+
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    int array[] = {15,20,25,30,35};
+    int i;
+    int * ptr_array = array;
+    for (i = 0;i<5;i++) {
+        printf("第%d个元素的值为%d,地址为%p\n",i,*ptr_array,ptr_array);
+        ptr_array ++ ;
+    }
+
+    /*
+    第0个元素的值为15,地址为0028FF0C
+    第1个元素的值为20,地址为0028FF10
+    第2个元素的值为25,地址为0028FF14
+    第3个元素的值为30,地址为0028FF18
+    第4个元素的值为35,地址为0028FF1C
+    */
+    return 0;
+}
+
+```
+
+int型地址间隔4个字节。
+
+
+
