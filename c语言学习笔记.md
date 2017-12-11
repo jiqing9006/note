@@ -1962,3 +1962,131 @@ int型地址间隔4个字节。
 
 
 
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#define N 7
+
+int main()
+{
+    int array[N] = {15,20,25,30,35,40,90};
+    int i;
+    int temp;
+    // 实现数组的逆序
+    // 数组的首尾元素进行交换
+    for (i = 0;i<floor(N/2);i++) {
+        temp = array[i];
+        array[i] = array[N-i-1];
+        array[N-i-1] = temp;
+    }
+
+    for (i = 0;i<N;i++) {
+        printf("交换后第%d元素的值为:%d\n",i,*(array + i));
+    }
+    return 0;
+}
+
+```
+
+逆序数组，找规律是写程序必备的技能！
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#define N 7
+
+int main()
+{
+    int array[N] = {15,20,25,30,35,40,90};
+    int i;
+    int temp;
+
+    int * ptr_head;
+    int * ptr_foot;
+    ptr_head = &array[0];
+    ptr_foot = &array[N-1];
+
+    // 实现数组的逆序
+    // 数组的首尾元素进行交换
+    for (i = 0;i<floor(N/2);i++) {
+        temp = * ptr_head;
+        * ptr_head = * ptr_foot;
+        * ptr_foot = temp;
+        ptr_head ++;
+        ptr_foot --;
+    }
+
+    for (i = 0;i<N;i++) {
+        printf("交换后第%d元素的值为:%d\n",i,*(array + i));
+    }
+    return 0;
+}
+
+```
+
+指针实现数组逆序！
+
+
+
+**二维数组与指针**
+
+首地址
+
+```c
+&a[0][0]
+```
+
+> 有祥有略！有精有简！有的放矢有的取舍去学习！
+
+何为二维数组，如何理解？由n个一维数组组成！
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+
+int main()
+{
+    int i,j;
+    double score[5][3] = {
+        {55,56,57},
+        {58,59,60},
+        {61,62,63},
+        {64,65,66},
+        {67,68,69}
+    };
+
+    // 传统的访问方式
+    for (i = 0;i < 5;i++) {
+        for (j = 0;j <3 ;j++) {
+            printf("%.2lf\t",score[i][j]);
+        }
+
+        printf("\n");
+    }
+
+    printf("=================================\n");
+
+    // 指针的方式访问
+    for (i = 0;i < 5;i++) {
+        for (j = 0;j <3 ;j++) {
+            // printf("%.2lf\t",*(score[i] + j));
+            printf("%.2lf\t",*(*(score+i) + j));
+        }
+
+        printf("\n");
+    }
+
+
+    return 0;
+}
+
+```
+
+>  \*(\*(score + i) + j) 获取二维数组的公式！
+
+> 老九语录，会赋值，会打印就差不多了！多练习练习再做个小项目就可以了！
+
