@@ -1321,11 +1321,277 @@ Redis会记录上次重写时的AOF的大小，默认配置是当AOF文件大小
 
 例子：银行转账，要么成功，要么失败。
 
+```
+192.168.1.66:6379> MULTI
+OK
+192.168.1.66:6379> set k1 v1
+QUEUED
+192.168.1.66:6379> set k2 v2
+QUEUED
+192.168.1.66:6379> set k3 v3
+QUEUED
+192.168.1.66:6379> set k4 v4
+QUEUED
+192.168.1.66:6379> get k2
+QUEUED
+192.168.1.66:6379> EXEC
+1) OK
+2) OK
+3) OK
+4) OK
+5) "v2"
+
+```
+
+好比购物先加入购物车，最后EXEC统一结账。
+
+```
+192.168.1.66:6379> MULTI
+OK
+192.168.1.66:6379> set k1 11
+QUEUED
+192.168.1.66:6379> set k2 22
+QUEUED
+192.168.1.66:6379> set k3 33
+QUEUED
+192.168.1.66:6379> DISCARD
+OK
+192.168.1.66:6379> get k1 
+"v1"
+
+```
+
+DISCARD 撤销所有操作！
+
+```
+192.168.1.66:6379> MULTI
+OK
+192.168.1.66:6379> set k1 v1
+QUEUED
+192.168.1.66:6379> set k2 v2
+QUEUED
+192.168.1.66:6379> getset k3
+(error) ERR wrong number of arguments for 'getset' command
+192.168.1.66:6379> set k4 v4
+QUEUED
+192.168.1.66:6379> EXEC
+(error) EXECABORT Transaction discarded because of previous errors.
+
+```
+
+加入时只要有一个出错误，统统的不执行！
+
+> 周阳语录:年轻的时候，就是练级打怪的时候，勇敢的上！挑战自己！30以前不要怕，30岁以后不要悔！有机会就跳进去干！
+
+```
+192.168.1.66:6379> set k1 1
+OK
+192.168.1.66:6379> set k2 2
+OK
+192.168.1.66:6379> set k3 3
+OK
+192.168.1.66:6379> set k4 4
+OK
+192.168.1.66:6379> MULTI
+OK
+192.168.1.66:6379> incr k1 
+QUEUED
+192.168.1.66:6379> decr k2
+QUEUED
+192.168.1.66:6379> EXEC
+1) (integer) 2
+2) (integer) 1
+192.168.1.66:6379> get k1
+"2"
+192.168.1.66:6379> get k2
+"1"
+
+```
+
+k1增加了，k2减小了！通过事物处理，妥妥的不出错！
+
+```
+192.168.1.66:6379> set k1 v1
+OK
+192.168.1.66:6379> set k2 v2
+OK
+192.168.1.66:6379> set k3 v3
+OK
+192.168.1.66:6379> set k4 v4
+OK
+192.168.1.66:6379> MULTI
+OK
+192.168.1.66:6379> incr k1
+QUEUED
+192.168.1.66:6379> set k2 22
+QUEUED
+192.168.1.66:6379> set k3 33
+QUEUED
+192.168.1.66:6379> set k4 44
+QUEUED
+192.168.1.66:6379> get k4
+QUEUED
+192.168.1.66:6379> EXEC
+1) (error) ERR value is not an integer or out of range
+2) OK
+3) OK
+4) OK
+5) "44"
+```
+
+加入队列时不出错，下面的都将正常运行，执行时出错不影响其他语句！
+
+**Watch监控** 重要
+
+悲观锁、乐观锁、CAS（check and set）
+
+行锁，表锁，并发性与一致性的对立！表锁，并发性及其差，但是一致性非常好！
+
+工作中，正常用乐观锁！并发性会更好！
+
+悲观锁每次拿数据的时候都会上锁（行锁，表锁）。并发性差！
+
+乐观锁，每次去拿数据不会上锁，但是更新的时候，使用版本号机制。判断一下在此期间别人有没有去更新这个数据。
+
+乐观锁策略：提交版本必须大于记录当前版本才能执行更新。
+
+一旦执行了exec之前加的监控锁都会被取消掉！
+
+Watch指令类似于乐观锁！如果key值已经被客户端改变，整个事务队列都不会被执行！把最新的数据拿下来，再次执行！
+
+开启，入队，执行。（事务的三个阶段）
+
+------------------------------------------------------
+
+**主从复制，读写分离** Master/Slave
+
+**是什么**
+
+master写入
+
+slave读取
+
+**能干嘛**
+
+读写分离，更加安全，性能提升
+
+**怎么玩**
+
+一主二仆、薪火相传、反客为主
+
+> 周明老师，能够把长篇大论总结的很精辟。
+
+1. 配从不配主
+2. slaveof 主库ip 主库端口
+
+准备三台机器
+
+一主，二从
+
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171212132518691-1777562429.png)
+
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171212132522660-1746428185.png)
+
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171212132526816-836478889.png)
 
 
 
+66是主机，61、62作为从机。
 
+通过info replication 进行查看身份。
 
+```
+192.168.1.66:6379> info replication
+# Replication
+role:master
+connected_slaves:0
+master_replid:ba9a0c9d5cbeb6f7ce375b4c3559f5e848fc7025
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:0
+second_repl_offset:-1
+repl_backlog_active:0
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:0
+repl_backlog_histlen:0
+
+```
+
+设置61、62跟随66
+
+```
+192.168.1.61:6379> slaveof 192.168.1.66 6379
+OK
+192.168.1.61:6379> info replication
+# Replication
+role:slave
+master_host:192.168.1.66
+master_port:6379
+master_link_status:down
+master_last_io_seconds_ago:-1
+master_sync_in_progress:0
+slave_repl_offset:1
+master_link_down_since_seconds:1513056594
+slave_priority:100
+slave_read_only:1
+connected_slaves:0
+master_replid:ba9a0c9d5cbeb6f7ce375b4c3559f5e848fc7025
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:0
+second_repl_offset:-1
+repl_backlog_active:0
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:0
+repl_backlog_histlen:0
+
+```
+
+```
+192.168.1.62:6379> slaveof 192.168.1.66 6379
+OK
+192.168.1.62:6379> info replication
+# Replication
+role:slave
+master_host:192.168.1.66
+master_port:6379
+master_link_status:down
+master_last_io_seconds_ago:-1
+master_sync_in_progress:0
+slave_repl_offset:1
+master_link_down_since_seconds:1513056636
+slave_priority:100
+slave_read_only:1
+connected_slaves:0
+master_replid:ff1f0f120165c6673a797e65aa0d82e3ccbe9a6c
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:0
+second_repl_offset:-1
+repl_backlog_active:0
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:0
+repl_backlog_histlen:0
+
+```
+
+> tips:MASTER aborted replication with an error: NOAUTH Authentication required. 出现了这个错误。需要从服务器中添加配置。masterauth 123456 (123456是主redis的密码，此参数是当与主连接时的密码验证)
+
+设置了主从复制之后，此时在主机中，
+
+```
+192.168.1.66:6379> set k4 v4
+OK
+```
+
+在从机中查看，
+
+```
+192.168.1.61:6379> get k4
+"v4"
+```
+
+```
+192.168.1.62:6379> get k4
+"v4"
+```
 
 
 
