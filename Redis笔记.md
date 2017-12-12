@@ -1591,23 +1591,209 @@ OK
 ```
 192.168.1.62:6379> get k4
 "v4"
+
+```
+
+只要变为从机，主机中数据都会被弄过来！
+
+> 周阳老师语录：学的不是指令，而是探寻知识的过程！指令分分钟讲完！但是思考知识更重要！
+>
+> 不停的破坏，不停的做实验，不停的尝试！折腾！才能更好的理解知识！
+
+
+
+> 周明老师语录：读书或者看视频，产生争议和思考了，比不思考要有收获。带着思考学习，带着问题读书。
+
+在主从复制中，如果主机宕机了，从机还是从机！原地待命中！
+
+主机恢复之后，主从体系不会被破坏！
+
+
+
+薪火相传 66 传61，61传62
+
+```
+192.168.1.66:6379> info replication
+# Replication
+role:master
+connected_slaves:1
+slave0:ip=192.168.1.61,port=6379,state=online,offset=3288,lag=1
+master_replid:dddb7b383d4153816d28377f65c6ed7d688ac8bf
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:3288
+second_repl_offset:-1
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:1
+repl_backlog_histlen:3288
+
 ```
 
 
 
+```
+192.168.1.61:6379> info replication
+# Replication
+role:slave
+master_host:192.168.1.66
+master_port:6379
+master_link_status:up
+master_last_io_seconds_ago:7
+master_sync_in_progress:0
+slave_repl_offset:6197
+slave_priority:100
+slave_read_only:1
+connected_slaves:1
+slave0:ip=192.168.1.62,port=6379,state=online,offset=6197,lag=0
+master_replid:dddb7b383d4153816d28377f65c6ed7d688ac8bf
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:6197
+second_repl_offset:-1
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:573
+repl_backlog_histlen:5625
+
+```
 
 
 
+```
+192.168.1.62:6379> info replication
+# Replication
+role:slave
+master_host:192.168.1.61
+master_port:6379
+master_link_status:up
+master_last_io_seconds_ago:3
+master_sync_in_progress:0
+slave_repl_offset:5931
+slave_priority:100
+slave_read_only:1
+connected_slaves:0
+master_replid:dddb7b383d4153816d28377f65c6ed7d688ac8bf
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:5931
+second_repl_offset:-1
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:5819
+repl_backlog_histlen:113
+
+
+```
+
+注意了，master_link_status:up表示成功，master_link_status:down表示失败。原因可能是主机的端口号没有打开！
+
+```
+iptables -I INPUT 4 -p tcp -m state --state NEW -m tcp --dport 6379 -j ACCEPT
+```
 
 
 
+反客为主命令
+
+```
+192.168.1.61:6379> SLAVEOF no one
+OK
+192.168.1.61:6379> set k11 v11
+OK
+```
+
+```
+192.168.1.62:6379> get k11
+"v11"
+192.168.1.62:6379> set k12 v12
+(error) READONLY You can't write against a read only slave.
+```
+
+前提是，你下面要有小弟，你才能反客为主！
 
 
 
+主从复制，第一次会全量复制，之后是增量复制。只要重新连接master，都会执行一次全量复制。
 
 
 
+哨兵模式，反客为主的自动版本！主机挂了，会自动从从机中选择一个牛人，作为新的主机。在哨兵模式中，主机回归之后，变成从机了。
 
+**怎么玩**
+
+在从机中新建一个哨兵配置sentinel.conf
+
+```
+sentinel monitor mymaster 192.168.1.61 6379 1
+sentinel auth-pass mymaster 123456
+```
+
+开启哨兵监控！
+
+```
+redis-sentinel /myredis/sentinel.conf 
+```
+
+```
+
+[root@localhost bin]# redis-sentinel /myredis/sentinel.conf 
+4880:X 12 Dec 16:15:34.969 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+4880:X 12 Dec 16:15:34.969 # Redis version=4.0.1, bits=64, commit=00000000, modified=0, pid=4880, just started
+4880:X 12 Dec 16:15:34.969 # Configuration loaded
+4880:X 12 Dec 16:15:34.970 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+                _._                                                  
+           _.-``__ ''-._                                             
+      _.-``    `.  `_.  ''-._           Redis 4.0.1 (00000000/0) 64 bit
+  .-`` .-```.  ```\/    _.,_ ''-._                                   
+ (    '      ,       .-`  | `,    )     Running in sentinel mode
+ |`-._`-...-` __...-.``-._|'` _.-'|     Port: 26379
+ |    `-._   `._    /     _.-'    |     PID: 4880
+  `-._    `-._  `-./  _.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |           http://redis.io        
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |                                  
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+      `-._    `-.__.-'    _.-'                                       
+          `-._        _.-'                                           
+              `-.__.-'                                               
+
+4880:X 12 Dec 16:15:34.973 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+4880:X 12 Dec 16:15:34.992 # Sentinel ID is 5bdc4c724103019a7d987848ce6a8af91341ee1d
+4880:X 12 Dec 16:15:34.992 # +monitor master mymaster 192.168.1.66 6379 quorum 1
+4880:X 12 Dec 16:15:46.522 * +slave slave 192.168.1.61:6379 192.168.1.61 6379 @ mymaster 192.168.1.66 6379
+4880:X 12 Dec 16:15:46.593 * +slave slave 192.168.1.62:6379 192.168.1.62 6379 @ mymaster 192.168.1.66 6379
+4880:X 12 Dec 16:16:16.655 # +sdown slave 192.168.1.62:6379 192.168.1.62 6379 @ mymaster 192.168.1.66 6379
+4880:X 12 Dec 16:17:02.014 # +sdown master mymaster 192.168.1.66 6379
+4880:X 12 Dec 16:17:02.014 # +odown master mymaster 192.168.1.66 6379 #quorum 1/1
+4880:X 12 Dec 16:17:02.014 # +new-epoch 1
+4880:X 12 Dec 16:17:02.014 # +try-failover master mymaster 192.168.1.66 6379
+4880:X 12 Dec 16:17:02.024 # +vote-for-leader 5bdc4c724103019a7d987848ce6a8af91341ee1d 1
+4880:X 12 Dec 16:17:02.024 # +elected-leader master mymaster 192.168.1.66 6379
+4880:X 12 Dec 16:17:02.024 # +failover-state-select-slave master mymaster 192.168.1.66 6379
+4880:X 12 Dec 16:17:02.125 # +selected-slave slave 192.168.1.61:6379 192.168.1.61 6379 @ mymaster 192.168.1.66 6379
+4880:X 12 Dec 16:17:02.125 * +failover-state-send-slaveof-noone slave 192.168.1.61:6379 192.168.1.61 6379 @ mymaster 192.168.1.66 6379
+4880:X 12 Dec 16:17:02.184 * +failover-state-wait-promotion slave 192.168.1.61:6379 192.168.1.61 6379 @ mymaster 192.168.1.66 6379
+4880:X 12 Dec 16:17:03.085 # +promoted-slave slave 192.168.1.61:6379 192.168.1.61 6379 @ mymaster 192.168.1.66 6379
+4880:X 12 Dec 16:17:03.085 # +failover-state-reconf-slaves master mymaster 192.168.1.66 6379
+4880:X 12 Dec 16:17:03.184 * +slave-reconf-sent slave 192.168.1.62:6379 192.168.1.62 6379 @ mymaster 192.168.1.66 6379
+4880:X 12 Dec 16:17:03.184 # +failover-end master mymaster 192.168.1.66 6379
+4880:X 12 Dec 16:17:03.184 # +switch-master mymaster 192.168.1.66 6379 192.168.1.61 6379
+4880:X 12 Dec 16:17:03.185 * +slave slave 192.168.1.62:6379 192.168.1.62 6379 @ mymaster 192.168.1.61 6379
+4880:X 12 Dec 16:17:03.185 * +slave slave 192.168.1.66:6379 192.168.1.66 6379 @ mymaster 192.168.1.61 6379
+4880:X 12 Dec 16:17:33.238 # +sdown slave 192.168.1.66:6379 192.168.1.66 6379 @ mymaster 192.168.1.61 6379
+4880:X 12 Dec 16:17:33.238 # +sdown slave 192.168.1.62:6379 192.168.1.62 6379 @ mymaster 192.168.1.61 6379
+4880:X 12 Dec 16:22:14.045 # -sdown slave 192.168.1.62:6379 192.168.1.62 6379 @ mymaster 192.168.1.61 6379
+4880:X 12 Dec 16:25:14.815 * +fix-slave-config slave 192.168.1.62:6379 192.168.1.62 6379 @ mymaster 192.168.1.61 6379
+
+```
+
+哨兵配置文件可以放在任意一个从服务器中。
+
+
+
+> 周阳语录：这些牛逼的技术，公司不一定让你去做，但是你要懂！懂了才有机会去做！
+
+主从复制的缺点，是有一定的延迟，主数据更新到从数据库有一定的延迟。
 
 
 
