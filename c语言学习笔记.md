@@ -1883,3 +1883,251 @@ int main()
 ```
 
 > 一个变量就是一个内存空间，内存一定是有物理地址的！指针就是保存变量内存物理地址的变量！
+
+### 指针与数组
+
+数组是一个连续的内存空间，数组名就是它的首地址。
+
+```C
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    double score[] = {98,87,65,43,76};
+    printf("数组的首地址:%p\t 数组手元素的地址 :%p\n",score,&score[0]);
+
+}
+
+```
+
+数组名就是数组元素的首地址。
+
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171210000617685-1549460925.png)
+
+```C
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    int i;
+    double score[5] = {98,87,65,43,76};
+    double * ptr_score;
+    ptr_score = score;
+    for (i=0;i<5;i++) {
+        printf("%.2lf\n",*ptr_score++); // 通过首地址取找数组元素的值
+    }
+
+    for (i=0;i<5;i++) {
+        printf("%.2lf\n",score[i]);
+    }
+
+}
+```
+
+
+
+等价的！double类型的数据，每个数据移动了8个字节。物理地址是一个十六进制的数字。
+
+
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    int array[] = {15,20,25,30,35};
+    int i;
+    int * ptr_array = array;
+    for (i = 0;i<5;i++) {
+        printf("第%d个元素的值为%d,地址为%p\n",i,*ptr_array,ptr_array);
+        ptr_array ++ ;
+    }
+
+    /*
+    第0个元素的值为15,地址为0028FF0C
+    第1个元素的值为20,地址为0028FF10
+    第2个元素的值为25,地址为0028FF14
+    第3个元素的值为30,地址为0028FF18
+    第4个元素的值为35,地址为0028FF1C
+    */
+    return 0;
+}
+
+```
+
+int型地址间隔4个字节。
+
+
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#define N 7
+
+int main()
+{
+    int array[N] = {15,20,25,30,35,40,90};
+    int i;
+    int temp;
+    // 实现数组的逆序
+    // 数组的首尾元素进行交换
+    for (i = 0;i<floor(N/2);i++) {
+        temp = array[i];
+        array[i] = array[N-i-1];
+        array[N-i-1] = temp;
+    }
+
+    for (i = 0;i<N;i++) {
+        printf("交换后第%d元素的值为:%d\n",i,*(array + i));
+    }
+    return 0;
+}
+
+```
+
+逆序数组，找规律是写程序必备的技能！
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#define N 7
+
+int main()
+{
+    int array[N] = {15,20,25,30,35,40,90};
+    int i;
+    int temp;
+
+    int * ptr_head;
+    int * ptr_foot;
+    ptr_head = &array[0];
+    ptr_foot = &array[N-1];
+
+    // 实现数组的逆序
+    // 数组的首尾元素进行交换
+    for (i = 0;i<floor(N/2);i++) {
+        temp = * ptr_head;
+        * ptr_head = * ptr_foot;
+        * ptr_foot = temp;
+        ptr_head ++;
+        ptr_foot --;
+    }
+
+    for (i = 0;i<N;i++) {
+        printf("交换后第%d元素的值为:%d\n",i,*(array + i));
+    }
+    return 0;
+}
+
+```
+
+指针实现数组逆序！
+
+
+
+**二维数组与指针**
+
+首地址
+
+```c
+&a[0][0]
+```
+
+> 有祥有略！有精有简！有的放矢有的取舍去学习！
+
+何为二维数组，如何理解？由n个一维数组组成！
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+
+int main()
+{
+    int i,j;
+    double score[5][3] = {
+        {55,56,57},
+        {58,59,60},
+        {61,62,63},
+        {64,65,66},
+        {67,68,69}
+    };
+
+    // 传统的访问方式
+    for (i = 0;i < 5;i++) {
+        for (j = 0;j <3 ;j++) {
+            printf("%.2lf\t",score[i][j]);
+        }
+
+        printf("\n");
+    }
+
+    printf("=================================\n");
+
+    // 指针的方式访问
+    for (i = 0;i < 5;i++) {
+        for (j = 0;j <3 ;j++) {
+            // printf("%.2lf\t",*(score[i] + j));
+            printf("%.2lf\t",*(*(score+i) + j));
+        }
+
+        printf("\n");
+    }
+
+
+    return 0;
+}
+
+```
+
+>  \*(\*(score + i) + j) 获取二维数组的公式！
+
+> 老九语录，会赋值，会打印就差不多了！多练习练习再做个小项目就可以了！
+
+-----------------------------------------------------------------------------------------------
+
+函数-神奇的黑盒
+
+内置函数，由C语言系统提供！
+
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171211232055618-646370014.png)
+
+
+
+自定义函数，带参数，不带参数！
+
+```C
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+
+int main()
+{
+    printf("%.2lf\n",ceil(98.01)); // 天花板 99
+    printf("%.2lf\n",floor(98.99)); // 地板98
+
+    printf("%.2lf\n",sqrt(9)); // 求平方根 3
+    printf("%.2lf\n",pow(4,2)); // 求平方根 16
+    printf("%d\n",abs(-19)); // 求绝对值 19
+
+    return 0;
+}
+
+```
+
+````
+// 改变颜色
+system("color 4E");
+````
+
+dos系统中也可以使用！
+
+![](http://images2017.cnblogs.com/blog/422101/201712/422101-20171212000836571-178521657.png)
+
