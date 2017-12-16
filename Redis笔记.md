@@ -1795,9 +1795,52 @@ redis-sentinel /myredis/sentinel.conf
 
 主从复制的缺点，是有一定的延迟，主数据更新到从数据库有一定的延迟。
 
+-------------------------------------
+
+jedis 操作redis
+
+```java
+package com.company;
+import redis.clients.jedis.Jedis;
+
+public class Main {
+
+    public static void main(String[] args) {
+	    // write your code here
+        Jedis jedis = new Jedis("192.168.0.66",6379);
+        jedis.auth("123456");
+        System.out.println(jedis.ping());
+    }
+}
+```
 
 
 
+```java
+package com.company;
+import redis.clients.jedis.Jedis;
+
+public class TestAPI {
+
+    public static void main(String[] args) {
+        // write your code here
+        Jedis jedis = new Jedis("192.168.0.66",6379);
+        jedis.auth("123456");
+
+        jedis.set("k1","v1");
+        jedis.set("k2","v2");
+        jedis.set("k3","v3");
+        jedis.set("k4","v4");
+        jedis.set("k5","v5");
+
+
+        System.out.println(jedis.get("k5"));
+    }
+}
+
+```
+
+> 获取数据，通常这些工作不是由java程序员处理。而是由运维人员处理。将热点高频数据，灌入redis数据库中。
 
 
 
