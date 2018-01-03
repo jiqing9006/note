@@ -42,13 +42,176 @@ swap分区，内存扩展分区。1.5或2倍。内存不够的时候，会写入
 
 一个月拿个4,5千，确实不应该是一个男人拿的薪资。--MK
 
+```
+Ctrl+L
+```
+
+清屏
+
+```
+nmtui
+```
+
+管理网卡（确保是桥接模式，ip配置成局域网中的ip）
+
+```
+[root@local ~]# systemctl status NetworkManager
+● NetworkManager.service - Network Manager
+   Loaded: loaded (/usr/lib/systemd/system/NetworkManager.service; enabled; vendor preset: enabled)
+   Active: active (running) since 二 2018-01-02 16:17:18 CST; 18h ago
+ Main PID: 1064 (NetworkManager)
+   CGroup: /system.slice/NetworkManager.service
+           └─1064 /usr/sbin/NetworkManager --no-daemon
+```
+
+查看模块NetworkManager运行状态！
+
+```
+systemctl restart NetworkManager
+```
+
+重启NetworkManager服务。
+
+```
+vi /etc/sysconfig/network-scripts/ifcfg-eno16777736
+```
+
+修改网络配置。
+
+```
+[root@local ~]# systemctl status firewalld.service
+● firewalld.service - firewalld - dynamic firewall daemon
+   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled; vendor preset: enabled)
+   Active: active (running) since 二 2018-01-02 16:17:18 CST; 21h ago
+ Main PID: 885 (firewalld)
+   CGroup: /system.slice/firewalld.service
+           └─885 /usr/bin/python -Es /usr/sbin/firewalld --nofork --nopid
+```
+
+查看防火墙状态！
+
+```
+systemctl stop firewalld.service
+```
+
+关闭防火墙！
+
+```
+systemctl disable firewalld.service
+```
+
+禁止防火墙开机启动。
+
+再一个，关闭selinux，方便进行linux的学习。
+```
+getenforce
+```
+查看selinux状态，点击滚轮粘贴
+
+```
+setenforce 0
+```
+临时关闭selinux
+
+永久关闭的话，需要设置配置
+```
+vi /etc/selinux/config
+```
+或者
+```
+vi /etc/sysconfig/selinux
+```
+将SELINUX=enforcing改为SELINUX=disabled
+
+```
+Esc+u
+```
+可以撤销vi的操作。
+
+重启系统后生效。
+```
+reboot
+```
+
+------------------------------
+
+设置光盘，开机自动挂载。
+
+挂载， 在linux操作系统中， 挂载是指将一个设备（通常是存储设备）挂接到一个已存在的目录上。 我们要访问存储设备中的文件，必须将文件所在的分区挂载到一个已存在的目录上， 然后通过访问这个目录来访问存储设备。
+
+```
+vi /etc/fstab
+```
+
+Linux下，一切皆文件。光驱也是文件。```/dev/```  下面的文件是设备文件,```/mnt``` 是用来挂载设备的，挂载后，就可以查看挂载设备中的内容了。
+
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180103143220815-266300953.png)
+
+```
+mount -a 
+```
+
+验证挂载是否配置成功！
+
+```
+[root@local sysconfig]# mount -a 
+mount: /dev/sr0 写保护，将以只读方式挂载
+[root@local sysconfig]# ls /mnt
+addons  EULA  images    LiveOS      Packages       repodata                 RPM-GPG-KEY-redhat-release
+EFI     GPL   isolinux  media.repo  release-notes  RPM-GPG-KEY-redhat-beta  TRANS.TBL
+```
+
+卸载挂载
+
+```
+[root@local sysconfig]# umount /mnt
+[root@local sysconfig]# ls /mnt
+```
+
+可以挂到别的目录下，只要是空的都行。
+
+```
+[root@local sysconfig]# ls /dev/cdrom
+/dev/cdrom
+```
+
+直接访问硬件系统，是啥都看不到的。
+
+--------------------
+
+先死后活，先记住，再灵活运用。
+
+拍个快照，方便系统坏了，找回。
+
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180103150623815-842296457.png)
 
 
 
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180103150756878-262917312.png)
 
+硬件知识，cpu，内存，i/o总线，电源，机箱。
 
+需求：公司需要做一个内容发布网站，展示公司的信息，你需要选择符合公司要求的Web服务器，做成公司的Web服务器。目前的预算是2-3万元，希望公司的网站能够正常运行。
 
+评估访问量。搜索主流服务器，对比大致的价格。
 
+（主板，硬盘，内存，机箱，电源，风扇等）。
+
+服务器上的显卡都是集成的，因为不需要显示东西。
+
+一般RDIMM带寄存器的，一般用于服务器。UDIMM，无缓冲双通道内存模块，一般用于家用。
+
+**大型机、小型机、x86服务器的区别**
+
+首先来讲x86服务器，与平常人们所接触的台式机笔记本类似，采用CISC架构处理器。随着英特尔至强处理器的性能不断提升，业内有种说法是x86服务器有抢占小型机市场的趋势。
+
+小型机，是一种介于PC服务器和大型机之间的高性能计算机，一般认为，传统小型机是指采用RISC、MIPS等专用处理器，主要支持UNIX操作系统的封闭、专用的计算机系统，所以又称RISC服务器或Unix服务器。
+
+大型机，又名大型主机，使用专用的处理器指令集、操作系统和应用软件。故此，大型机不仅仅是一个硬件上的概念，更是一个硬件和专属软件的有机整体。大型机是上世纪六十年代发展起来的计算机系统。经过四十年的不断更新，其稳定性和安全性在所有计算机系统中是首屈一指的。
+
+现在的大型机的性能，并不能用单一的每秒并行浮点计算能力来体现，大型机相比于其他计算机系统，其主要特点在于其RAS(Reliability, Availability, Serviceability 高可靠性、高可用性、高服务性）。对于一些企业，其关键业务往往需要不间断服务，亚马逊网站宕机一分钟的损失就超过5万美元。力求零宕机的大型机正好符合要求。
+
+Red Hat下载一个小型机的版本，内核跟其他版本不一样。可以跑在小型机上面。因为CPU的指令是不一样的。
 
 
 
