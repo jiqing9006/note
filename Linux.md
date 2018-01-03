@@ -213,19 +213,105 @@ EFI     GPL   isolinux  media.repo  release-notes  RPM-GPG-KEY-redhat-beta  TRAN
 
 Red Hat下载一个小型机的版本，内核跟其他版本不一样。可以跑在小型机上面。因为CPU的指令是不一样的。
 
+------------------------------
+
+tty控制台终端。
+
+pts虚拟终端。
+
+tty1 图形界面。
+
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180103162702596-1465458272.png)
+
+tty2 字符界面。
+
+```
+Ctrl+Alt+F2-6
+```
 
 
 
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180103163217628-1119817247.png)
 
 
 
+在字符界面下，通过```Alt+F2``` 切换回来。或者切换到其他的字符界面。
 
+```
+Alt+F2 
+```
 
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180103163511706-566273204.png)
 
+pts虚拟终端。
 
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180103163802846-1974267951.png)
 
+```
+Ctrl+Shift+加号
+```
 
+放大字体
 
+```
+Ctrl+Shift+T 
+```
 
+新建新的终端，这个在shell链接中无效。只在系统中操作有效。
 
+```
+Alt+数字
+```
+
+在虚拟终端之间切换。
+
+```
+who am i
+```
+
+查看当前登录的用户所在终端。
+
+ssh的作用，是远程链接Linux服务器。连上之后，也算是一个终端。
+
+```
+[root@local ~]# who am i
+root     pts/2        2018-01-03 16:22 (192.168.0.33)
+[root@local ~]# ssh root@192.168.0.66
+The authenticity of host '192.168.0.66 (192.168.0.66)' can't be established.
+RSA key fingerprint is 45:33:b7:09:a9:a0:c0:77:f4:e5:12:80:9d:0d:14:f2.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '192.168.0.66' (RSA) to the list of known hosts.
+root@192.168.0.66's password: 
+Last login: Mon Jan  1 18:32:22 2018 from 192.168.0.33
+[root@localhost ~]# who am i
+root     pts/0        2018-01-03 00:59 (192.168.0.77)
+
+```
+
+33的机器，访问77的终端，再在77的终端中链接66。
+
+```
+[root@localhost local]# exit
+logout
+Connection to 192.168.0.66 closed.
+
+```
+
+exit退出。
+
+```
+ls -a 
+```
+
+显示隐藏文件，linux隐藏的文件前面都有一个点。
+
+man ls 查看详细执行操作。
+
+```
+空格键（Space）：代表向下翻一页。
+Enter：代表向下滚动一行。
+/字符串：代表在当前显示的内容中，向下查找“字符串”这个关键字。
+q：代表立即退出，不予显示。
+b或[ctrl]-b：往回翻，不过该操作只对文件有用。
+```
 
