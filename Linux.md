@@ -336,3 +336,110 @@ Linux下不同的颜色代表不同的文件类型：
 
 
 
+-------------------------------
+
+### 系统时间与开关机
+
+* 查看系统时间
+
+  ```
+  date
+  ```
+
+
+* 查看硬件日期
+
+  ```
+  hwclock
+  ```
+
+学习Linux不必全部指令都会，只要记住主要常用的几个就可以了。--MK
+
+
+
+* 关机命令
+
+  ```
+  shutdown init reboot poweroff
+  ```
+
+  ```
+  [root@local ~]# shutdown -h +10
+  Shutdown scheduled for 四 2018-01-04 23:34:56 CST, use 'shutdown -c' to cancel.
+  [root@local ~]# 
+  Broadcast message from root@local.rhel77.com (Thu 2018-01-04 23:24:56 CST):
+
+  The system is going down for power-off at Thu 2018-01-04 23:34:56 CST!
+
+  ```
+
+  十分钟之后关机。
+
+  ```
+  shutdown -c
+  ```
+
+  取消关机。
+
+
+### Linux下端口号的分配
+
+  TCP和UDP采用16位的端口号来识别应用程序。
+
+  2^16 = 65536 一个有0到65535。
+
+  TCP端口分配：
+
+  ```
+  21 ftp 文件传输服务
+  22 ssh 安全远程连接服务
+  23 telnet 远程连接服务
+  25 smtp 电子邮件服务
+  80 http web服务
+  443 https 安全web服务
+  ```
+
+  UDP端口分配：
+
+  ```
+  69 tftp 简单文件传输协议
+  123 ntp 时间同步服务
+  ```
+
+  可以通过
+
+  ```
+  vi /etc/services
+  ```
+
+  进入查看详细的端口使用情况。
+
+
+### 查看端口的监听状态
+
+```
+netstat
+```
+
+tcp anpt
+
+udp anpu
+
+全部 anput
+
+```
+[root@local ~]# netstat -antup | grep sshd
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      1227/sshd           
+tcp        0     52 192.168.0.77:22         192.168.0.101:49390     ESTABLISHED 2713/sshd: root@pts 
+tcp6       0      0 :::22                   :::*                    LISTEN      1227/sshd   
+```
+
+
+
+```
+[root@local ~]# netstat -antup | grep :22
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      1227/sshd           
+tcp        0     52 192.168.0.77:22         192.168.0.101:49390     ESTABLISHED 2713/sshd: root@pts 
+tcp6       0      0 :::22                   :::*                    LISTEN      1227/sshd     
+```
+
