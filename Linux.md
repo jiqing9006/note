@@ -428,7 +428,7 @@ udp anpu
 全部 anput
 
 ```
-[root@local ~]# netstat -antup | grep sshd
+[root@local ~]# netstat -anput | grep sshd
 tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      1227/sshd           
 tcp        0     52 192.168.0.77:22         192.168.0.101:49390     ESTABLISHED 2713/sshd: root@pts 
 tcp6       0      0 :::22                   :::*                    LISTEN      1227/sshd   
@@ -437,9 +437,259 @@ tcp6       0      0 :::22                   :::*                    LISTEN      
 
 
 ```
-[root@local ~]# netstat -antup | grep :22
+[root@local ~]# netstat -anput | grep :22
 tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      1227/sshd           
 tcp        0     52 192.168.0.77:22         192.168.0.101:49390     ESTABLISHED 2713/sshd: root@pts 
 tcp6       0      0 :::22                   :::*                    LISTEN      1227/sshd     
 ```
+
+```
+[root@local ~]# vi /etc/hostname
+```
+
+修改主机名。
+
+配置hosts文件，DNS解析的时候，先看hosts，再看DNS。
+
+```
+vi /etc/hosts
+```
+
+查看网关情况。
+
+```
+route -n
+```
+
+ping 指令。
+
+```
+[root@local ~]# ping -c 4 www.baidu.com
+PING www.a.shifen.com (180.97.33.108) 56(84) bytes of data.
+64 bytes from 180.97.33.108: icmp_seq=1 ttl=55 time=11.8 ms
+64 bytes from 180.97.33.108: icmp_seq=2 ttl=55 time=12.7 ms
+64 bytes from 180.97.33.108: icmp_seq=3 ttl=55 time=12.5 ms
+64 bytes from 180.97.33.108: icmp_seq=4 ttl=55 time=12.1 ms
+
+--- www.a.shifen.com ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3007ms
+rtt min/avg/max/mdev = 11.824/12.310/12.732/0.376 ms
+```
+
+
+
+-----------------------------------------
+
+Linux当中，一切皆文件。
+
+### Linux目录结构
+
+```/```  根分区，只有root用户对此目录拥有写权限。
+
+```/etc``` 配置文件
+
+``` /boot``` 启动文件
+
+``` /var ``` 可增长的目录 。日志，文件等。
+
+``` /root ``` 管理员所有数据 root用户的家目录。
+
+``` /tmp ``` 临时文件 （大概15天清空一次。）
+
+``` /usr ``` unix software source  /usr/src 源代码目录。/usr/local 自己的软件安装位置。
+
+``` /bin``` 命令 二进制可执行文件。
+
+``` /sbin ``` 系统命令。
+
+``` /mnt``` 挂载目录。
+
+```/dev``` 设备文件。 一切皆文件，终端，磁盘等。键盘，鼠标等。
+
+```/home ``` 普通用户文件存放位置。
+
+``` /proc ``` 虚拟目录。可以查看每个进程的情况。
+
+``` /lib``` 存放系统的库文件（动态库，静态库。 .a静态库，.so动态库）。类似于.dll文件。
+
+
+
+### 绝对路径与相对路径
+
+绝对路径是从```/``` 开始的。
+
+相对路径是以```.``` ```..``` 开始的。
+
+
+
+### 创建，删除复制文件
+
+```
+touch a.txt
+```
+
+创建一个文件
+
+```
+mkdir test
+```
+
+创建一个目录
+
+```
+[root@local ~]# cat a.txt
+hello linux
+```
+
+查看文件
+
+```
+[root@local ~]# less /var/log/messages
+```
+
+less 可以上下左右查看。enter，空格都是下一页。q退出查看。
+
+```
+[root@local ~]# more /var/log/messages 
+```
+
+more只能向下翻页查看。
+
+```
+[root@local ~]# cat /var/log/messages 
+```
+
+cat一次性展示所有内容。
+
+```
+[root@local ~]# tail -n 10 /var/log/messages 
+Jan  5 15:30:01 local systemd: Started Session 14 of user root.
+Jan  5 15:30:01 local systemd: Starting Session 14 of user root.
+Jan  5 15:40:01 local systemd: Started Session 15 of user root.
+Jan  5 15:40:01 local systemd: Starting Session 15 of user root.
+Jan  5 15:50:01 local systemd: Started Session 16 of user root.
+Jan  5 15:50:01 local systemd: Starting Session 16 of user root.
+Jan  5 16:00:01 local systemd: Started Session 17 of user root.
+Jan  5 16:00:01 local systemd: Starting Session 17 of user root.
+Jan  5 16:01:01 local systemd: Started Session 18 of user root.
+Jan  5 16:01:01 local systemd: Starting Session 18 of user root.
+
+```
+
+tail 最后多少行。
+
+```
+[root@local ~]# head -n 10 /var/log/messages 
+Jan  2 16:17:58 local rsyslogd: [origin software="rsyslogd" swVersion="7.4.7" x-pid="887" x-info="http://www.rsyslog.com"] start
+Jan  2 16:17:47 local journal: Runtime journal is using 8.0M (max allowed 99.2M, trying to leave 148.9M free of 984.9M available → current limit 99.2M).
+Jan  2 16:17:47 local journal: Runtime journal is using 8.0M (max allowed 99.2M, trying to leave 148.9M free of 984.9M available → current limit 99.2M).
+Jan  2 16:17:47 local kernel: Initializing cgroup subsys cpuset
+Jan  2 16:17:47 local kernel: Initializing cgroup subsys cpu
+Jan  2 16:17:47 local kernel: Initializing cgroup subsys cpuacct
+Jan  2 16:17:47 local kernel: Linux version 3.10.0-327.el7.x86_64 (mockbuild@x86-034.build.eng.bos.redhat.com) (gcc version 4.8.3 20140911 (Red Hat 4.8.3-9) (GCC) ) #1 SMP Thu Oct 29 17:29:29 EDT 2015
+Jan  2 16:17:47 local kernel: Command line: BOOT_IMAGE=/vmlinuz-3.10.0-327.el7.x86_64 root=UUID=87b51ffa-2f57-4ac2-99e7-e491bb257520 ro rhgb quiet LANG=zh_CN.UTF-8
+Jan  2 16:17:47 local kernel: Disabled fast string operations
+Jan  2 16:17:47 local kernel: e820: BIOS-provided physical RAM map:
+
+```
+
+head 开头多少行。
+
+```
+[root@local ~]# tail -f -n 10 /var/log/messages 
+Jan  5 15:30:01 local systemd: Started Session 14 of user root.
+Jan  5 15:30:01 local systemd: Starting Session 14 of user root.
+Jan  5 15:40:01 local systemd: Started Session 15 of user root.
+Jan  5 15:40:01 local systemd: Starting Session 15 of user root.
+Jan  5 15:50:01 local systemd: Started Session 16 of user root.
+Jan  5 15:50:01 local systemd: Starting Session 16 of user root.
+Jan  5 16:00:01 local systemd: Started Session 17 of user root.
+Jan  5 16:00:01 local systemd: Starting Session 17 of user root.
+Jan  5 16:01:01 local systemd: Started Session 18 of user root.
+Jan  5 16:01:01 local systemd: Starting Session 18 of user root.
+Jan  5 16:03:51 local systemd-logind: New session 19 of user root.
+Jan  5 16:03:51 local systemd: Started Session 19 of user root.
+Jan  5 16:03:51 local systemd: Starting Session 19 of user root.
+Jan  5 16:03:51 local dbus[887]: [system] Activating service name='org.freedesktop.problems' (using servicehelper)
+Jan  5 16:03:51 local dbus-daemon: dbus[887]: [system] Activating service name='org.freedesktop.problems' (using servicehelper)
+Jan  5 16:03:51 local dbus[887]: [system] Successfully activated service 'org.freedesktop.problems'
+Jan  5 16:03:51 local dbus-daemon: dbus[887]: [system] Successfully activated service 'org.freedesktop.problems'
+
+```
+
+tail -f 动态的查看数据。这个很实用。
+
+```
+[root@local ~]# rm -r test2
+rm：是否删除目录 "test2"？y
+```
+
+```
+[root@local ~]# rm -rf test
+```
+
+rm -r 包括子目录，-f 强制删除。
+
+cp  复制。
+
+```
+[root@local ~]# cp b.txt a.txt
+```
+
+
+
+mv 重命名。剪切。
+
+```
+[root@local ~]# mv a.txt b.txt
+```
+
+-------------------------------------------
+
+vi 使用！
+
+通过which指令来查看文件位置！
+
+```
+[root@local ~]# which vim
+/usr/bin/vim
+[root@local ~]# which vi
+/usr/bin/vi
+```
+
+```
+[root@local ~]# rpm -qf /usr/bin/vi
+vim-minimal-7.4.160-1.el7.x86_64
+[root@local ~]# rpm -qf /usr/bin/vim
+vim-enhanced-7.4.160-1.el7.x86_64
+```
+
+查看版本！
+
+整体使用，查看系统是否安装了vim。
+
+```
+[root@local ~]# rpm -qf `which vim`
+vim-enhanced-7.4.160-1.el7.x86_64
+```
+
+``` !$``` 表示上一个命令的最后一个参数。
+
+```
+[root@local ~]# vim /etc/passwd
+[root@local ~]# vi !$
+vi /etc/passwd
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
