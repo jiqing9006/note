@@ -681,15 +681,185 @@ vim-enhanced-7.4.160-1.el7.x86_64
 vi /etc/passwd
 ```
 
+### 命令模式
+
+**```i``` 光标前插入**
+
+```I ```行首插入
+
+```a ``` 光标后插入
+
+``` A``` 行尾插入
+
+```o``` 下一行插入
+
+```O``` 上一行插入
 
 
 
+```x``` 向后删除一个字符，
+
+```X``` 向前删除一个字符。
+
+```u``` 撤销一步。
 
 
 
+**行首与行尾**
+
+```home``` 或者 ```^ ``` 行首
+
+```$```  或者 ```end ``` 行尾
 
 
 
+**删除复制粘贴**
+
+```dd ``` 删除一行 ```数字+dd``` 删除多行
+
+```yy``` 复制一行 ```数字+yy``` 复制多行
+
+```p``` 粘贴
 
 
+
+**删除到行尾**
+
+```shift+d ``` 或者 ```d+end```
+
+**单词操作**
+
+``` w```  单词之间切换
+
+``` dw```  删除一个单词
+
+
+
+###  命令行模式
+
+```w``` 保存
+
+```q``` 退出
+
+```q!``` 强制退出不保存
+
+```wq``` 保存退出
+
+```wq!``` 强制保存并退出
+
+```ZZ``` 也可以保存退出
+
+
+
+**vim中定位**
+
+```gg ``` 定位到行首
+
+```G``` 定位到最后一行，行首
+
+```数字+G``` 定位到某一行，行首
+
+```：数字``` 定位到某一行
+
+```数字+gg```定位到某一行
+
+
+
+-------------------------------
+
+Linux 用户与组
+
+```
+root超级用户，UID 0
+
+系统用户(伪用户，不登录)，UID 1~999
+
+普通用户，UID 1000+
+
+```
+
+用户组就是具有相同特征的用户的集合。一个组可以包含多个用户，每个用户也可以属于不同的组。用户组在Linux中扮演着重要的角色，方便管理员对用户进行集中管理。等你有了成百上千个用户的时候，你就知道组有多么方便了。
+
+linux 先死后活！ 先死记住！ 再讲原理。
+
+### 添加用户的相关命令
+
+语法：useradd 用户名（区分大小写）
+
+常用参数：
+
+-u UID
+
+-d 宿主目录
+
+-g 起始组
+
+-G 附加组
+
+-s 登录shell
+
+-m 自动建立用户的登入目录
+
+```
+[root@local ~]# adduser san
+[root@local ~]# tail -n 1 /etc/passwd
+san:x:1001:1001::/home/san:/bin/bash
+[root@local ~]# tail -1 /etc/passwd
+san:x:1001:1001::/home/san:/bin/bash
+[root@local ~]# adduser SAN
+[root@local ~]# tail -2 /etc/passwd
+san:x:1001:1001::/home/san:/bin/bash
+SAN:x:1002:1002::/home/SAN:/bin/bash
+```
+
+```/etc/passwd``` 文件，保存系统账户信息。
+
+创建一个局部权限的用户，将```/var/www```目录权限给他。
+
+
+
+----------------------------
+
+```
+rpm -ivh  vsftpd-3.0.2-10.el7.x86_64.rpm 
+```
+
+安装vsftpd服务。
+
+```
+vi /etc/vsftpd/vsftpd.conf 
+```
+
+配置主文件
+
+**chroot_local_user** 设置为YES。防止用户切换目录。
+
+```
+anonymous_enable=NO
+
+chroot_local_user=YES
+chroot_list_enable=NO
+chroot_list_file=/etc/vsftpd/chroot_list
+```
+
+```
+vi /etc/vsftpd/user_list
+```
+
+注释掉root
+
+```
+vi /etc/vsftpd/ftpusers 
+```
+
+注释掉root
+
+
+```
+systemctl start vsftpd.service
+```
+
+重启服务
+
+http://blog.csdn.net/haoshidai/article/details/50639057
 
