@@ -1,3 +1,5 @@
+
+
 技术不分年龄高低，只分水平高低。
 
 搞技术25k以下是不看天赋的，25k以上是要看天赋的。
@@ -782,7 +784,7 @@ root超级用户，UID 0
 
 linux 先死后活！ 先死记住！ 再讲原理。
 
-### 添加用户的相关命令
+### 用户的相关命令
 
 语法：useradd 用户名（区分大小写）
 
@@ -813,4 +815,278 @@ SAN:x:1002:1002::/home/SAN:/bin/bash
 ```
 
 ```/etc/passwd``` 文件，保存系统账户信息。
+
+```
+[root@local www]# which adduser
+/usr/sbin/adduser
+[root@local www]# which useradd
+/usr/sbin/useradd
+[root@local www]# ll /usr/sbin/adduser
+lrwxrwxrwx. 1 root root 7 1月   2 15:56 /usr/sbin/adduser -> useradd
+```
+
+useradd 跟 adduser是一样的效果。
+
+开源思维，一切都可以修改。跟老司机，学习的是经验和思维。
+
+```
+[root@local www]# chsh -l
+/bin/sh
+/bin/bash
+/sbin/nologin
+/usr/bin/sh
+/usr/bin/bash
+/usr/sbin/nologin
+/bin/tcsh
+/bin/csh
+```
+
+查看系统中的壳。
+
+```
+[root@local www]# useradd -u 2018 zhubajie
+[root@local www]# id zhubajie
+uid=2018(zhubajie) gid=2018(zhubajie) 组=2018(zhubajie)
+[root@local www]# useradd -g 2018 sunwukong 
+[root@local www]# useradd -g 2018 niumowang
+[root@local www]# id sunwukong
+uid=2019(sunwukong) gid=2018(zhubajie) 组=2018(zhubajie)
+[root@local www]# id niumowang
+uid=2020(niumowang) gid=2018(zhubajie) 组=2018(zhubajie)
+
+```
+
+指定用户组
+
+```
+[root@local www]# ll /home
+总用量 4
+drwx------. 14 jiqing    jiqing   4096 1月   2 16:38 jiqing
+drwx------   3 niumowang zhubajie   74 1月   9 09:36 niumowang
+drwx------   3 sunwukong zhubajie   74 1月   9 09:36 sunwukong
+drwx------   3 zhubajie  zhubajie   74 1月   9 09:35 zhubajie
+[root@local www]# userdel sunwukong
+[root@local www]# ll /home
+总用量 4
+drwx------. 14 jiqing    jiqing   4096 1月   2 16:38 jiqing
+drwx------   3 niumowang zhubajie   74 1月   9 09:36 niumowang
+drwx------   3      2019 zhubajie   74 1月   9 09:36 sunwukong
+drwx------   3 zhubajie  zhubajie   74 1月   9 09:35 zhubajie
+[root@local www]# userdel -r niumowang
+[root@local www]# ll /home
+总用量 4
+drwx------. 14 jiqing   jiqing   4096 1月   2 16:38 jiqing
+drwx------   3     2019 zhubajie   74 1月   9 09:36 sunwukong
+drwx------   3 zhubajie zhubajie   74 1月   9 09:35 zhubajie
+
+```
+
+userdel 删除 -r 彻底删除。
+
+
+
+### 密码文件 /etc/shadow
+
+```
+vim /etc/shadow
+```
+
+```
+root:$6$SAbdjDh6vas5CQXF$atWNnFJ5XlKKJuPQpP1SqOBb5K3QjtrFFCR.MMF3pAGEk6SB6giV0pgvhXj4qF2IbG3SqnrTQN3Kru6VCWVMQ1::0:99999:7:::
+...
+jiqing:$6$VSgx2Ag/$bqF3.5GGPiUzNiVN02dExyGUxzLqNuuju/Q0WNHjr2vROKP1LAv0hDSh.rAnmQ98WGgcRu1BNoKkNZWhksNth0:17533:0:99999:7:::
+www:$6$GH90pCSs$Dm/V2.X5nSsO/5YiPtE/9iZmU3iVJrZFXjKQAsCJ/zQdZ5eq2pB84h.oxlomg0dGYlU.piXpN4CRJHDzyzHma/:17539:0:99999:7:::
+zhubajie:!!:17540:0:99999:7:::
+```
+
+修改密码的两种方式
+
+```
+[root@local www]# passwd zhubajie
+更改用户 zhubajie 的密码 。
+新的 密码：
+无效的密码： 密码少于 8 个字符
+重新输入新的 密码：
+passwd：所有的身份验证令牌已经成功更新。
+
+```
+
+通过passwd进行修改。
+
+```
+[root@local www]# echo 123456 | passwd --stdin zhubajie
+更改用户 zhubajie 的密码 。
+passwd：所有的身份验证令牌已经成功更新。
+
+```
+
+通过管道模式修改用户密码。
+
+两个用户密码一样，加密后的内容不一样。
+
+```
+[root@local www]# echo 123456|sha1sum 
+c4f9375f9834b4e7f0a528cc65c055702bf5f24a  -
+
+```
+
+hash 123456。
+
+
+
+### 组管理
+
+本地组，远程组（域）
+
+超级用户组root GID 0
+
+普通用户组
+
+​	系统用户组 GID 1-999
+
+​	本地用户组 GID 1000+
+
+注：每一个用户都有一个同名的组。除非你额外指定它。
+
+```
+vim /etc/group
+```
+
+查看组。
+
+-------------------------------------
+
+环境变量
+
+```
+[root@local ~]# echo $PATH
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
+```
+
+注：只有自己执行的命令在PATH变量包括的目录下，才可以直接使用。否则只能通过绝对路径或者相对路径来使用。
+
+```
+[root@local ~]# vim /etc/profile  
+[root@local ~]# source /etc/profile
+```
+
+修改环境变量。
+
+```
+PATH="$PATH:/root"
+export PATH
+```
+
+
+
+位置变量
+
+利用位置变量写一个加法的脚本。
+
+```
+
+#! /bin/bash
+SUM=$(expr $1 + $2)
+echo "$1 + $2 = $SUM"
+
+```
+
+```
+[root@local ~]# vim add.sh
+[root@local ~]# chmod +x add.sh
+[root@local ~]# add.sh 100 200
+100 + 200 = 300
+
+```
+
+
+
+---------------------------------------------------
+
+文件查找方法
+
+1.which
+
+查找可执行文件的位置
+
+```
+[root@local /]# which passwd
+/usr/bin/passwd
+```
+
+
+
+2.whereis 
+
+查找可执行文件的位置与相关的文件
+
+```
+[root@local /]# whereis passwd
+passwd: /usr/bin/passwd /etc/passwd /usr/share/man/man1/passwd.1.gz /usr/share/man/man5/passwd.5.gz
+
+```
+
+
+
+3.grep
+
+过滤
+
+```
+[root@local /]# grep home /etc/passwd
+jiqing:x:1000:1000:jiqing:/home/jiqing:/bin/bash
+www:x:1001:1001::/home/www:/sbin/nologin
+zhubajie:x:2018:2018::/home/zhubajie:/bin/bash
+sunwukong:x:2019:2018::/home/sunwukong:/bin/bash
+niumowang:x:2020:2018::/home/niumowang:/bin/bash
+```
+
+```
+[root@local /]# netstat -anpo | grep :22
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      5711/sshd            off (0.00/0/0)
+tcp        0     52 192.168.70.77:22        192.168.70.33:59072     ESTABLISHED 9414/sshd: root@pts  on (0.23/0/0)
+tcp        0      0 192.168.70.77:22        192.168.70.33:56269     ESTABLISHED 5732/sshd: www [pri  keepalive (1019.14/0/0)
+tcp6       0      0 :::22                   :::*                    LISTEN      5711/sshd            off (0.00/0/0)
+```
+
+```
+-a (all)显示所有选项，默认不显示LISTEN相关。
+-n 拒绝显示别名，能显示数字的全部转化成数字。
+-p 显示建立相关链接的程序名。
+```
+
+4.find
+
+找文件 ```.``` 当前目```/``` 根目录。
+
+```
+-type 
+b 设备文件
+d 目录
+c 字符设备文件
+p 管道文件
+l 符号链接文件
+f 普通文件
+```
+
+```
+[root@local /]# find  / -name  passwd -type f
+/etc/passwd
+/etc/pam.d/passwd
+/usr/bin/passwd
+/usr/share/bash-completion/completions/passwd
+```
+
+```
+[root@local /]# find  /etc/ -name  "host*"
+/etc/selinux/targeted/modules/active/modules/hostname.pp
+/etc/host.conf
+/etc/hosts
+/etc/hosts.allow
+/etc/hosts.deny
+/etc/avahi/hosts
+/etc/hostname
+```
+
+搜索以host开头的文件
 
