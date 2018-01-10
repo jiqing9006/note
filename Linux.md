@@ -1092,3 +1092,343 @@ f 普通文件
 
 --------------------------------------------
 
+Nginx安装
+
+1.复制解压。
+
+```
+[root@localhost ~]# mv /opt/nginx-1.13.8.tar.gz /usr/local/src
+[root@localhost ~]# cd /usr/local/src
+[root@localhost src]# tar -zxvf nginx-1.13.8.tar.gz 
+```
+
+2.编译安装
+
+```
+[root@localhost src]# cd nginx-1.13.8
+[root@localhost nginx-1.13.8]# ./configure --prefix=/usr/local/nginx 
+```
+
+如果没有安装pcre、pcre-devel、openssl、zlib都安装一下。
+
+提示
+
+```
+Configuration summary
+  + using system PCRE library
+  + OpenSSL library is not used
+  + using system zlib library
+```
+
+
+
+```
+[root@localhost nginx-1.13.8]# ./configure --prefix=/usr/local/nginx  --with-openssl=/usr/local/openssl
+```
+
+调整，增加openssl位置绑定。
+
+3.安装
+
+```
+make && make install
+```
+
+4.检测是否安装成功
+
+```
+ps -ef |grep nginx
+```
+
+ps 查看进程。
+-e 显示所有进程。
+-f 全格式。
+
+```
+[root@localhost sbin]# ./nginx
+[root@localhost sbin]# ps -ef |grep nginx
+root       9334      1  0 18:38 ?        00:00:00 nginx: master process ./nginx
+nobody     9335   9334  0 18:38 ?        00:00:00 nginx: worker process
+root       9341   4092  0 18:38 pts/1    00:00:00 grep nginx
+```
+
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180110104343863-547950507.png)
+
+5.配置环境变量
+
+```
+[root@localhost sbin]# vim /etc/profile
+```
+
+```
+PATH=$PATH:/usr/local/nginx/sbin
+export PATH
+```
+
+```
+[root@localhost sbin]# source /etc/profile
+```
+
+这个时候就可以在任何地方操作nginx了。
+
+```
+[root@localhost local]# nginx -s stop
+[root@localhost local]# ps -ef |grep nginx
+root       9370   4092  0 18:46 pts/1    00:00:00 grep nginx
+```
+
+6.nginx关闭
+
+```
+[root@localhost local]# nginx -s stop
+```
+
+其他的方式
+
+```
+kill -quit 主进程号
+kill -term 主进程号
+pkill -9 nginx
+```
+-----------------------
+
+### 配置php-fpm
+
+```
+[root@localhost php7]# which php-fpm
+/usr/local/php7/sbin/php-fpm
+[root@localhost php7]# php-fpm
+[09-Jan-2018 19:52:28] ERROR: failed to open configuration file '/usr/local/php7/etc/php-fpm.conf': No such file or directory (2)
+[09-Jan-2018 19:52:28] ERROR: failed to load configuration file '/usr/local/php7/etc/php-fpm.conf'
+[09-Jan-2018 19:52:28] ERROR: FPM initialization failed
+[root@localhost php7]# find / -name 'php-fpm.conf.default'
+/usr/local/php7/etc/php-fpm.conf.default
+[root@localhost php7]# cp /usr/local/php7/etc/php-fpm.conf.default /usr/local/php7/etc/php-fpm.conf
+[root@localhost php7]# php-fpm
+[09-Jan-2018 19:58:27] WARNING: Nothing matches the include pattern '/usr/local/php7/etc/php-fpm.d/*.conf' from /usr/local/php7/etc/php-fpm.conf at line 125.
+[09-Jan-2018 19:58:27] ERROR: No pool defined. at least one pool section must be specified in config file
+[09-Jan-2018 19:58:27] ERROR: failed to post process the configuration
+[09-Jan-2018 19:58:27] ERROR: FPM initialization failed
+[root@localhost php7]# ll /usr/local/php7/etc/php-fpm.d/
+total 20
+-rw-r--r--. 1 root root 18521 Dec 28 22:13 www.conf.default
+[root@localhost php7]# cp /usr/local/php7/etc/php-fpm.d/www.conf.default /usr/local/php7/etc/php-fpm.d/www.conf
+[root@localhost php7]# php-fpm
+
+```
+
+启动php-fpm成功！
+
+```
+[root@localhost php7]# ps -ef | grep php-fpm
+root       9677      1  0 20:00 ?        00:00:00 php-fpm: master process (/usr/local/php7/etc/php-fpm.conf)
+nobody     9678   9677  0 20:00 ?        00:00:00 php-fpm: pool www
+nobody     9679   9677  0 20:00 ?        00:00:00 php-fpm: pool www
+root       9681   4092  0 20:01 pts/1    00:00:00 grep php-fpm
+
+```
+
+或者通过netstat查看
+
+```
+[root@localhost php7]# netstat -anpo | grep 9000
+tcp        0      0 127.0.0.1:9000              0.0.0.0:*                   LISTEN      9677/php-fpm        off (0.00/0/0)
+[root@localhost php7]# netstat -anpo | grep php-fpm
+tcp        0      0 127.0.0.1:9000              0.0.0.0:*                   LISTEN      9677/php-fpm        off (0.00/0/0)
+unix  3      [ ]         STREAM     CONNECTED     232696 9677/php-fpm        
+unix  3      [ ]         STREAM     CONNECTED     232695 9677/php-fpm      
+```
+
+配置 php-fpm 服务
+
+```
+[root@localhost php7]# cp /usr/local/src/php-7.1.2/sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
+[root@localhost php7]# chmod a+x /etc/init.d/php-fpm 
+```
+
+```
+[root@localhost php7]# service php-fpm start
+Starting php-fpm  done
+[root@localhost php7]# service php-fpm stop
+Gracefully shutting down php-fpm . done
+[root@localhost php7]# service php-fpm restart
+Gracefully shutting down php-fpm warning, no pid file found - php-fpm is not running ?
+Starting php-fpm  done
+[root@localhost php7]# ps -ef | grep php-fpm
+root       9825      1  0 21:33 ?        00:00:00 php-fpm: master process (/usr/local/php7/etc/php-fpm.conf)                                                                      
+nobody     9826   9825  0 21:33 ?        00:00:00 php-fpm: pool www                                                                                                               
+nobody     9827   9825  0 21:33 ?        00:00:00 php-fpm: pool www                                                                                                               
+root       9829   4092  0 21:33 pts/1    00:00:00 grep php-fpm
+```
+
+### 配置nginx支持php
+
+```
+[root@localhost ~]# useradd nginx -s /sbin/nologin -M
+```
+
+```
+[root@localhost php7]# vim /usr/local/nginx/conf/nginx.conf
+```
+
+```
+user nginx nginx;           # 指定Nginx服务的用户和用户组
+```
+
+```
+[root@localhost php7]# nginx -s reload
+```
+
+```
+[root@localhost php7]# ps -ef | grep nginx
+root       9583      1  0 19:24 ?        00:00:00 nginx: master process /usr/local/nginx/sbin/nginx
+nginx      9862   9583  0 21:49 ?        00:00:00 nginx: worker process      
+root       9866   4092  0 21:50 pts/1    00:00:00 grep nginx
+```
+
+这个时候用户就编程nginx了。
+
+继续修改其他配置。
+
+```
+#user  nobody;
+user nginx nginx;           # 指定Nginx服务的用户和用户组
+worker_processes auto;
+
+error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+pid        logs/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+    server_tokens off;
+    sendfile        on;
+    #tcp_nopush     on;
+    tcp_nodelay on;
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+    send_timeout 30;
+    gzip  on;
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        charset UTF-8;
+
+        #charset koi8-r;
+
+        #access_log  logs/host.access.log  main;
+
+        location / {
+            root   /var/webroot;
+            index  index.php index.html index.htm;
+        }
+
+        #error_page  404              /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /var/webroot;
+        }
+
+        # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+        #
+        #location ~ \.php$ {
+        #    proxy_pass   http://127.0.0.1;
+        #}
+
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        #
+        location ~ \.php$ {
+            root           /var/webroot;
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_index  index.php;
+            fastcgi_param  SCRIPT_FILENAME  /var/webroot/$fastcgi_script_name;
+            include        fastcgi_params;
+        }
+
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        #
+        #location ~ /\.ht {
+        #    deny  all;
+        #}
+    }
+
+
+    # another virtual host using mix of IP-, name-, and port-based configuration
+    #
+    #server {
+    #    listen       8000;
+    #    listen       somename:8080;
+    #    server_name  somename  alias  another.alias;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+
+    # HTTPS server
+    #
+    #server {
+    #    listen       443 ssl;
+    #    server_name  localhost;
+
+    #    ssl_certificate      cert.pem;
+    #    ssl_certificate_key  cert.key;
+
+    #    ssl_session_cache    shared:SSL:1m;
+    #    ssl_session_timeout  5m;
+
+    #    ssl_ciphers  HIGH:!aNULL:!MD5;
+    #    ssl_prefer_server_ciphers  on;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+}
+
+```
+
+```
+[root@localhost php7]# mkdir /var/webroot
+[root@localhost php7]# vim /var/webroot/index.php
+[root@localhost php7]# nginx -s reload
+```
+
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180110140524519-39279248.png)
+
+```
+[root@localhost php7]# service php-fpm stop
+Gracefully shutting down php-fpm . done
+```
+
+关闭了php-fpm就会出现错误了。
+
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180110140710832-2059556628.png)
+
+-----
+
