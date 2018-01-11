@@ -1432,3 +1432,316 @@ Gracefully shutting down php-fpm . done
 
 -----
 
+我们的CPU是分时运行的。可以同时运行多个程序，但是同一时间只能运行一个，但是切换的很快，就会给人的感觉是同时运行多个程序。一个CPU可以运行3个程序，那多核的CPU就可以运行更多的程序。
+
+进程也可以给优先级，多分配一些CPU。
+
+当这个程序执行完了，或者分配给他的CPU执行时间用完了，那它就要被切换出去，等待下一次CPU的临幸。在被切换出去的最后一步工作就是保存程序上下文，因为这个是下次他被CPU临幸的运行环境，必须保存。
+
+**先加载程序A的上下文，然后开始执行A，保存程序A的上下文，调入下一个要执行的程序B的程序上下文，然后开始执行B,保存程序B的上下文。**
+
+进程和线程就是这样的背景出来的，**两个名词不过是对应的CPU时间段的描述，名词就是这样的功能。**
+
+**进程就是包换上下文切换的程序执行时间总和**  = **CPU加载上下文+CPU执行+CPU保存上下文**。
+
+如果我们把进程比喻为一个运行在电脑上的软件，那么一个软件的执行不可能是一条逻辑执行的，必定有多个分支和多个程序段，就好比要实现程序A，实际分成 a，b，c等多个块组合而成。
+
+这里a，b，c的执行是共享了A的上下文，CPU在执行的时候没有进行上下文切换的。这**里的a，b，c就是线程，也就是说线程是共享了进程的上下文环境，是更细小的CPU时间段。**
+
+计算机的核心是CPU，它承担了所有的计算任务。它就像一座工厂，时刻在运行。
+
+一个车间开工的时候，其他车间都必须停工。背后的含义就是，单个CPU一次只能运行一个任务。
+
+进程就好比工厂的车间，它代表CPU所能处理的单个任务。任一时刻，CPU总是运行一个进程，其他进程处于非运行状态。
+
+一个车间里，可以有很多工人。他们协同完成一个任务。
+
+线程就好比车间里的工人。一个进程可以包括多个线程。
+
+每间房间的大小不同，有些房间最多只能容纳一个人，比如厕所。里面有人的时候，其他人就不能进去了。这代表一个线程使用某些共享内存时，其他线程必须等它结束，才能使用这一块内存。
+
+一个防止他人进入的简单方法，就是门口加一把锁。先到的人锁上门，后到的人看到上锁，就在门口排队，等锁打开再进去。这就叫"互斥锁"，防止多个线程同时读写某一块内存区域。
+
+任何进程（除init进程）都是由另一个进程创建，该进程称为被创建进程的父进程，被创建的进程称为子进程。
+
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180111100245207-890042116.png)
+
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180111101215097-1756408663.png)
+
+一个软件可以开启多个进程，共同工作。
+
+-----
+
+```
+top
+```
+
+NI表示进程的优先级。
+
+-20的优先级，非常的高。
+
+```
+top -p xxx
+```
+
+可以查看具体的进程情况。
+
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180111102307238-686493482.png)
+
+```
+renice -n -6 进程ID
+```
+
+可以改变一个正在运行的pid的优先级。
+
+```
+[root@local ~]# ps -ef | grep httpd
+root       4121      1  0 10:24 ?        00:00:00 /usr/sbin/httpd -DFOREGROUND
+apache     4122   4121  0 10:24 ?        00:00:00 /usr/sbin/httpd -DFOREGROUND
+apache     4123   4121  0 10:24 ?        00:00:00 /usr/sbin/httpd -DFOREGROUND
+apache     4124   4121  0 10:24 ?        00:00:00 /usr/sbin/httpd -DFOREGROUND
+apache     4125   4121  0 10:24 ?        00:00:00 /usr/sbin/httpd -DFOREGROUND
+apache     4126   4121  0 10:24 ?        00:00:00 /usr/sbin/httpd -DFOREGROUND
+root       4500   4439  0 10:38 pts/1    00:00:00 grep --color=auto httpd
+[root@local ~]# renice -n -5 4121
+4121 (进程 ID) 旧优先级为 0，新优先级为 -5
+```
+
+free -m 可以查看内存的使用情况。
+
+```
+[root@local ~]# free -m
+              total        used        free      shared  buff/cache   available
+Mem:           1985         493         955           9         536        1295
+Swap:          1999           0        1999
+```
+
+--------------------------------
+
+
+shell脚本。
+
+壳，充当一个翻译，让计算机能够认识的二进制程序，并将结果翻译给我们。
+
+加在内核上，可以跟内核打交道的壳。
+
+可以通过```/etc/shells``` 来查看。
+
+```
+[root@local ~]# cat /etc/shells
+/bin/sh
+/bin/bash
+/sbin/nologin
+/usr/bin/sh
+/usr/bin/bash
+/usr/sbin/nologin
+/bin/tcsh
+/bin/csh
+```
+
+可以增加shell，
+
+```
+yum install zsh
+```
+
+```
+[root@local ~]# zsh
+[root@local]~# cd /etc/sysconfig 
+[root@local]/etc/sysconfig# 
+```
+
+zsh可以显示绝对路径。
+
+最常用的shell是bash。
+
+编写一个shell脚本。
+
+shell是以.sh结尾的文件。（linux不以后缀名区分文件，为了方便记忆，通常都以.sh结尾）
+
+```
+[root@local ~]# vim first.sh
+```
+
+```shell
+#! /bin/bash
+# This is my first shell-script
+mkdir /root/shell
+ifconfig       
+```
+
+```
+[root@local ~]# chmod +x first.sh 
+```
+
+增加可执行的权限。
+
+执行脚本
+
+```
+[root@local ~]# first.sh
+eno16777736: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.70.77  netmask 255.255.255.0  broadcast 192.168.70.255
+        inet6 fe80::20c:29ff:fe6e:b72b  prefixlen 64  scopeid 0x20<link>
+        ether 00:0c:29:6e:b7:2b  txqueuelen 1000  (Ethernet)
+        RX packets 4917  bytes 408590 (399.0 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 2825  bytes 817074 (797.9 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 0  (Local Loopback)
+        RX packets 124  bytes 12730 (12.4 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 124  bytes 12730 (12.4 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+virbr0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 192.168.122.1  netmask 255.255.255.0  broadcast 192.168.122.255
+        ether 52:54:00:8c:58:59  txqueuelen 0  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+```
+
+就会显示出ip信息以及创建一个shell文件夹了。
+
+执行脚本的不同方式。
+
+绝对路径。
+
+相对路径。
+
+通过sh命令来执行。（不需要执行权限）
+
+```
+[root@local ~]# sh ./add.sh 100 200
+100 + 200 = 300
+[root@local ~]# which sh
+/usr/bin/sh
+[root@local ~]# ll /usr/bin/sh
+lrwxrwxrwx. 1 root root 4 1月   2 15:54 /usr/bin/sh -> bash
+```
+
+通过bash来执行。(不需要执行权限)
+
+```
+[root@local ~]# which bash
+/usr/bin/bash
+[root@local ~]# bash ./add.sh 100 200
+100 + 200 = 300
+
+```
+
+
+
+shell变量。
+
+自定义变量，环境变量，位置变量，预定义变量。
+
+一般使用echo来输出变量。
+
+```shell
+[root@local ~]# Linux=7.2
+[root@local ~]# linux=7.20
+[root@local ~]# echo $Linux
+7.2
+[root@local ~]# echo $linux
+7.20
+```
+
+区分大小写。
+
+当变量与字符容易混淆的时候可以使用大括号括起来。
+
+```shell
+[root@local ~]# echo ${Linux} system
+7.2 system
+```
+
+read 接收参数。
+
+```shell
+[root@local ~]# read dell hp
+1 2
+[root@local ~]# echo $dell $hp
+1 2
+```
+
+```
+[root@local ~]# read -p "输入您的密码:" passwd
+输入您的密码:123456
+[root@local ~]# echo $passwd
+123456
+```
+
+shell中的数值运算，通过内部命令expr命令来运算。
+
+```
+[root@local ~]# A=10
+[root@local ~]# B=20
+[root@local ~]# exp
+expand    export    exportfs  expr      
+[root@local ~]# expr $A + $B
+30
+[root@local ~]# expr $A - $B
+-10
+[root@local ~]# expr $A * $B
+expr: 语法错误
+[root@local ~]# expr $A \* $B
+200
+[root@local ~]# expr $A / $B
+0
+[root@local ~]# expr $A % $B
+10
+```
+
+保存计算的结果。
+
+```
+[root@local ~]# abc=$(expr $A + $B)
+[root@local ~]# echo $abc
+30
+```
+
+特殊的shell变量。
+
+环境变量，由系统本身运行需要提前创建好的一类变量。
+
+```
+[root@local ~]# env
+XDG_SESSION_ID=19
+HOSTNAME=local.rhel7.2-77.com
+SHELL=/bin/bash
+TERM=xterm
+HISTSIZE=1000
+SSH_CLIENT=192.168.70.33 62585 22
+SSH_TTY=/dev/pts/1
+USER=root
+LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;05;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.axa=01;36:*.oga=01;36:*.spx=01;36:*.xspf=01;36:
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root:/root/bin
+MAIL=/var/spool/mail/root
+PWD=/root
+LANG=zh_CN.UTF-8
+HISTCONTROL=ignoredups
+HOME=/root
+SHLVL=3
+LOGNAME=root
+SSH_CONNECTION=192.168.70.33 62585 192.168.70.77 22
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+XDG_RUNTIME_DIR=/run/user/0
+_=/usr/bin/env
+OLDPWD=/etc/sysconfig
+
+```
+
+环境变量存放位置，
+
+```
+/etc/profile
+```
+
