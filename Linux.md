@@ -1745,3 +1745,91 @@ OLDPWD=/etc/sysconfig
 /etc/profile
 ```
 
+----------------------------
+
+Nginx配置反向代理。
+
+
+
+准备两台服务器
+
+```
+http://192.168.70.66
+```
+
+```
+http://192.168.70.62
+```
+
+设置正则匹配（192.168.70.66）
+
+```
+vim /usr/local/nginx/conf/nginx.conf
+```
+
+增加
+
+```
+ location ~ .*\.(js|css)$ {
+            proxy_pass http://192.168.70.62:80;
+            proxy_set_header X-Forwarded-For $remote_addr;
+ }
+
+```
+
+重启
+
+```
+nginx -s reload
+```
+
+
+
+设置日志（192.168.70.62）
+
+```
+vim /usr/local/nginx/conf/nginx.conf
+```
+
+
+
+```
+log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+access_log  logs/access.log  main;
+```
+
+```
+nginx -s reload
+```
+
+访问
+
+```
+http://192.168.70.66/public/static/ace1.4/assets/js/jquery-2.1.4.min.js
+```
+
+其实这个时候已经访问的是
+
+```
+http://192.168.70.62/public/static/ace1.4/assets/js/jquery-2.1.4.min.js
+```
+
+将66下的js删除，一样可以访问。但是将62下的js删除，就不能访问了。
+
+下面是62下的日志信息。
+
+```
+cat /usr/local/nginx/logs/access.log 
+```
+
+```
+192.168.70.66 - - [11/Jan/2018:19:30:19 -0800] "GET /public/static/ace1.4/assets/js/jquery-2.1.4.min.js HTTP/1.0" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3298.4 Safari/537.36" "192.168.70.33"
+```
+
+来自66的访问，但是其实是33物理机的访问。
+
+这就是反向代理的基本情况。
+
