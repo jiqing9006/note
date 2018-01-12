@@ -1833,3 +1833,310 @@ cat /usr/local/nginx/logs/access.log
 
 这就是反向代理的基本情况。
 
+------------------------------
+
+Nginx的集群与负载均衡
+
+集群就是一群人干同样的活，负载均衡就是保证每个人都干得差不多。或者大人干得多一些，小孩干得少一些。
+
+Nginx实现负载均衡很方便。
+
+准备三台服务器，一台是用于访问图片（66）。另外是两台用于提供图片服务的集群（61,62）。
+
+先准备三个logo.png图片。
+
+66上如下：
+
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180112143006816-2132045563.png)
+
+61上如下：
+
+
+
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180112143012082-730233256.png)
+
+62上如下：
+
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180112143016066-768180408.png)
+
+
+
+设置图片组66：
+
+```
+upstream imgserver {
+        server 192.168.70.61:80 weight=1 max_fails=2 fail_timeout=30s;    
+        server 192.168.70.62:80 weight=1 max_fails=2 fail_timeout=30s;    
+    }
+
+```
+
+处理反向代理：
+
+```
+location ~ .*\.(jpg|jpeg|png|gif)$ {
+		proxy_pass http://imgserver;
+		proxy_set_header X-Forwarded-For $remote_addr;
+}
+```
+
+
+
+下面是完整的配置。
+
+```
+#user  nobody;
+user nginx nginx;           # 指定Nginx服务的用户和用户组
+worker_processes auto;
+
+error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+pid        logs/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  logs/access.log  main;
+    server_tokens off;
+    sendfile        on;
+    #tcp_nopush     on;
+    tcp_nodelay on;
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+    send_timeout 30;
+    gzip  on;
+	
+	upstream imgserver {
+        server 192.168.70.61:80 weight=1 max_fails=2 fail_timeout=30s;    
+        server 192.168.70.62:80 weight=1 max_fails=2 fail_timeout=30s;    
+    }
+    
+    server {
+        listen       80;
+        server_name  localhost;
+
+        charset UTF-8;
+
+        #charset koi8-r;
+
+        #access_log  logs/host.access.log  main;
+        
+        set $root /var/webroot/tp5admin;        
+
+        location / {
+            root   $root;
+            index  index.php index.html index.htm;
+            if ( -f $request_filename) {
+               break;
+            }
+            if ( !-e $request_filename) {
+                rewrite ^(.*)$ /index.php/$1 last;
+                break;
+            }
+        }
+
+        location ~ .*\.(jpg|jpeg|png|gif)$ {
+            proxy_pass http://imgserver;
+            proxy_set_header X-Forwarded-For $remote_addr;
+        }
+
+        location ~ .*\.(js|css)$ {
+            proxy_pass http://192.168.70.62:80;
+            proxy_set_header X-Forwarded-For $remote_addr;
+        }
+
+        #error_page  404              /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /var/webroot;
+        }
+
+        # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+        #
+        #location ~ \.php$ {
+        #    proxy_pass   http://127.0.0.1;
+        #}
+
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        #
+        location ~ \.php(.*)$ {
+            root           $root;
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_index  index.php;
+            fastcgi_param  SCRIPT_FILENAME  $DOCUMENT_ROOT$fastcgi_script_name;
+            fastcgi_param PATH_INFO $1; # 把pathinfo部分赋给PATH_INFO变量
+            include        fastcgi_params;
+        }
+
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        #
+        #location ~ /\.ht {
+        #    deny  all;
+        #}
+    }
+
+
+    # another virtual host using mix of IP-, name-, and port-based configuration
+    #
+    server {
+        listen       81;
+        server_name  localhost:81;
+        set $root /var/webroot;
+        location / {
+            root   $root;
+            index  index.php index.html index.htm;
+            if ( -f $request_filename) {
+               break;
+            }
+            if ( !-e $request_filename) {
+                rewrite ^(.*)$ /index.php/$1 last;
+                break;
+            }
+        }
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /var/webroot;
+        }
+        
+        location ~ .+\.php($|/) {
+            root           $root;
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_split_path_info ^((?U).+.php)(/?.+)$;
+            fastcgi_param PATH_INFO $fastcgi_path_info;
+            fastcgi_param PATH_TRANSLATED $document_root$fastcgi_path_info;
+            fastcgi_param    SCRIPT_FILENAME    $root$fastcgi_script_name;
+            include        fastcgi_params;
+        }
+
+
+    
+    }
+
+
+    # HTTPS server
+    #
+    #server {
+    #    listen       443 ssl;
+    #    server_name  localhost;
+
+    #    ssl_certificate      cert.pem;
+    #    ssl_certificate_key  cert.key;
+
+    #    ssl_session_cache    shared:SSL:1m;
+    #    ssl_session_timeout  5m;
+
+    #    ssl_ciphers  HIGH:!aNULL:!MD5;
+    #    ssl_prefer_server_ciphers  on;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+}
+
+```
+
+
+
+
+
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180112150351316-1453870041.gif)
+
+---------------------------------
+
+一个运行的程序，可能有多个进程。
+
+PID进程ID。
+
+UID启动进程的ID。
+
+进程所属组GID。
+
+进程的状态R运行、S睡眠、Z僵尸。
+
+父进程管理子进程，父进程终止的时候子进程也会终止。
+
+常用的组合为：
+
+```
+ps aux | ps -aux
+```
+
+字段含义：
+
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180112161657738-399416442.png)
+
+```
+USER：用户名称 
+PID：进程号 
+%CPU：进程占用CPU的百分比 
+%MEM：进程占用物理内存的百分比 
+VSZ：进程占用的虚拟内存大小（单位：KB） 
+RSS：进程占用的物理内存大小（单位：KB） 
+TT：终端名称（缩写），若为？，则代表此进程与终端无关，因为它们是由系统启动的 
+STAT：进程状态，其中S-睡眠，s-表示该进程是会话的先导进程，N-表示进程拥有比普通优先级更低的优先级，R-正在运行，D-短期等待，Z-僵死进程，T-被跟踪或者被停止等等 
+STARTED：进程的启动时间 
+TIME：CPU时间，即进程使用CPU的总时间 
+COMMAND：启动进程所用的命令和参数，如果过长会被截断显示 
+```
+
+
+
+```
+ps -ef
+```
+
+字段含义：
+
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180112161731129-1800012034.png)
+
+```
+UID：用户ID 
+PID：进程ID 
+PPID：父进程ID 
+C：CPU用于计算执行优先级的因子。数值越大，表明进程是CPU密集型运算，执行优先级会降低；数值越小，表明进程是I/O密集型运算，执行优先级会提高 
+STIME：进程启动的时间 
+TTY：完整的终端名称 
+TIME：CPU时间 
+CMD：完整的启动进程所用的命令和参数
+```
+
+
+
+> 如果想查看进程的CPU占用率和内存占用率，可以使用`aux` 
+> 如果想查看进程的父进程ID和完整的COMMAND命令，可以使用`ef`
+
+top 动态的查看进程。
+
+父进程死了，子进程没死，就形成了僵尸进程。会影响系统性能。
+
+默认3s刷新一次。
+
+空格立即刷新。
+
+q 退出。
+
+M 按内存排序。
+
+P 按CPU排序。
+
+-------------------------------------------
