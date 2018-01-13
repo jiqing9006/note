@@ -2140,3 +2140,204 @@ M 按内存排序。
 P 按CPU排序。
 
 -------------------------------------------
+
+chmod是修改第一列内容的 ，chown是修改第3,4列内容的。
+
+```
+[root@local ~]# chmod 777 -R add.sh
+```
+
+```
+[root@local ~]# chown jiqing:jiqing -R add.sh
+```
+
+![](http://images2017.cnblogs.com/blog/422101/201801/422101-20180113133627457-302547080.png)
+
+
+
+```
+文件类型权限 连接数 文件拥有者 文件所属组 文件大小 文件最后修改日期 文件名
+```
+
+Linux，天天玩就会了。汉语天天说就会了。其他的语言一样，天天玩，玩着玩着就会了。-- MK
+
+```
+类型 拥有者的权限 所属组的权限 其他人的权限 
+```
+
+文件类型：
+
+```
+- 文件
+d 文件夹
+l 链接
+b 光驱
+c 字符设备
+...
+```
+
+权限：
+
+```
+r 4 可读
+w 2 可写
+x 1 可执行
+rwx 7
+rw  6
+rx  5
+wx  3
+```
+
+对于文件，r读 w写 x执行
+
+对于文件夹 	r读 ls
+
+​		 	w 建文件、删除、移动 touch mkdir rm mv cp
+
+​			x 进入 cd
+
+> linux下，root就是superman，可以做任何事情，任何权限设置对于root来说都是浮云，因为root可以更改权限。
+
+```
+[jiqing@local root]$ ll -d shell
+drwxrwxrw- 3 root root 17 1月  13 14:56 shell
+[jiqing@local root]$ cd shell
+bash: cd: shell: 权限不够
+```
+
+没有x权限，无法进入查看文件夹。
+
+```
+[root@local ~]# chmod o-w+x shell
+```
+
+加上x权限，移除w权限。
+
+这个时候用户可以进入了。
+
+```
+[jiqing@local shell]$ mkdir test
+mkdir: 无法创建目录"test": 权限不够
+
+```
+
+```
+[jiqing@local shell]$ touch test.txt
+touch: 无法创建"test.txt": 权限不够
+```
+
+```
+[jiqing@local shell]$ mv demo demo2
+mv: 无法将"demo" 移动至"demo2": 权限不够
+```
+
+```
+[jiqing@local shell]$ mv demo.txt demo2.txt
+mv: 无法将"demo.txt" 移动至"demo2.txt": 权限不够
+
+```
+
+在shell文件夹中，没有创建文件夹，文件，修改文件夹，修改文件等权限。可以查看文件，可以查看文件夹。
+
+在子文件夹中，就可以根据子文件夹的权限，进行相应的操作了。
+
+```
+[root@local ~]# chmod o+w-r shell
+```
+
+移除r权限。
+
+```
+[jiqing@local root]$ ll -d shell
+drwxrwx-wx 3 root root 32 1月  13 15:09 shell
+[jiqing@local root]$ cd shell/
+[jiqing@local shell]$ ll
+ls: 无法打开目录.: 权限不够
+
+```
+
+仍然是在文件夹中，不具有ll权限。但是可以进行其他的操作。
+
+
+
+### chmod
+
+chmod 用户类型：
+
+```
+u 所有者
+g 所属组
+o 其他人
+a 所有全部
+```
+
+```
++ 加上权限
+- 移除权限
+= 设置权限
+```
+
+```
+chmod a+x add.sh # 为全部用户增加可执行权限在 a.txt的文件上
+```
+
+```
+chmod +111 add.sh 
+```
+
+上面两个一致。都是为所有用户增加可执行权限。
+
+```
+chmod uo+x add.sh
+```
+
+```
+chmod +101 add.sh
+```
+
+上面两个一致。都是为用户和其他人增加可执行权限。
+
+```
+[root@local ~]# ll -d shell
+drwxr-xr-x 2 root root 6 1月  11 11:04 shell
+```
+
+查看目录权限。
+
+### chown
+
+```
+[root@local ~]# chown root add.sh 
+```
+
+改变所属用户
+
+```
+[root@local ~]# chown :root add.sh 
+```
+
+改变所属组
+
+```
+[root@local ~]# chown root:root add.sh 
+```
+
+改变用户和组
+
+```
+[root@local ~]# chown jiqing:jiqing -R shell 
+```
+
+改变文件夹以及子文件用户及所属组
+
+```
+[jiqing@local root]$ ll -d  shell
+d--------- 3 jiqing jiqing 32 1月  13 15:17 shell
+[jiqing@local root]$ ll shell
+ls: 无法打开目录shell: 权限不够
+[jiqing@local root]$ cd shell
+bash: cd: shell: 权限不够
+```
+
+即便文件夹所有者是用户jiqing，但是他也没有权限进入和查看。
+
