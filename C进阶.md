@@ -293,7 +293,7 @@ struct 结构名称 * 结构指针变量名。
 
 结构指针变量->成员变量名
 
-```
+```c
 #include <stdio.h>
 #include <string.h>
 
@@ -325,7 +325,7 @@ int main()
     struct Player * ptr_player1 = &player1;
 
     printf("玩家%s \t 所属帮派%s \n",player1.name,player1.martial.name);
-    printf("玩家%s \t 所属帮派%s \n",ptr_player1->name,ptr_player1->martial.name);
+    printf("玩家%s \t 所属帮派%s \n",ptr_player1->name,ptr_player1->martial.name); // -> 指针访问
     printf("玩家%s \t 所属帮派%s \n",(*ptr_player1).name,(*ptr_player1).martial.name);
 
     return 0;
